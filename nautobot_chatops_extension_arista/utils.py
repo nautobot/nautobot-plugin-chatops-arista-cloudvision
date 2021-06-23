@@ -3,167 +3,27 @@ from datetime import datetime, timedelta
 from google.protobuf.timestamp_pb2 import Timestamp
 from cloudvision.Connector.grpc_client import GRPCClient, create_query
 from cvprac.cvp_client import CvpClient
+import requests
 import os
 
 fullpath = os.path.abspath(__file__)
 directory = os.path.dirname(fullpath)
 
-TOKEN = os.getenv("NAUTOBOT_CHATOPS_CVP_TOKEN")
-API_SERVER_ADDR = "apiserver.arista.io:443"
+CVAAS_TOKEN = os.getenv("NAUTOBOT_CHATOPS_CVAAS_TOKEN")
+CVAAS_ADDR = "apiserver.arista.io:443"
+CVP_USERNAME = os.getenv("CVP_USERNAME")
+CVP_PASSWORD = os.getenv("CVP_PASSWORD")
+CVP_HOST = os.getenv("CVP_HOSTNAME_OR_IP")
 TOKEN_FILE_PATH = f"{directory}/token.txt"
 
 CVP_LOGO_PATH = "cloudvision/CloudvisionLogoSquare.png"
 CVP_LOGO_ALT = "Cloudvision Logo"
 
-
 def cloudvision_logo(dispatcher):
     """Construct an image_element containing the locally hosted CVP logo"""
-    return dispatcher.image_element(dispatcher.static_url(CVP_LOGO_PATH), alt_text=CVP_LOGO_ALT)
-
-
-def connect_cvp():
-    clnt = CvpClient()
-    clnt.connect(["www.arista.io"], username="", password="", is_cvaas=True, api_token=TOKEN)
-    return clnt
-
-
-def get_cloudvision_container_devices(container_name):
-    """Get devices from specified container"""
-    clnt = connect_cvp()
-    result = clnt.api.get_devices_in_container(container_name)
-    return result
-
-
-def get_cloudvision_containers():
-    """Get list of all containers from CVP"""
-    clnt = connect_cvp()
-    result = clnt.api.get_containers()
-    return result["data"]
-
-
-def get_cloudvision_configlets_names():
-    """Get name of configlets"""
-    clnt = connect_cvp()
-    result = clnt.api.get_configlets()
-    return result["data"]
-
-
-def get_configlet_config(configlet_name):
-    """Get configlet config lines"""
-    clnt = connect_cvp()
-    result = clnt.api.get_configlet_by_name(configlet_name)
-    return result["config"]
-
-
-def get_cloudvision_devices_all():
-    """Get all devices in Cloudvision"""
-    clnt = connect_cvp()
-    result = clnt.get("/inventory/devices")
-    return result
-
-
-def get_cloudvsion_devices_all_resource():
-    """Get all devices in Cloudvision via resource API"""
-    clnt = connect_cvp()
-    dev_url = "/api/resources/inventory/v1/Device/all"
-    devices_data = clnt.get(dev_url)
-    devices = []
-    for device in devices_data["data"]:
-        try:
-            if device["result"]["value"]["streamingStatus"] == "STREAMING_STATUS_ACTIVE":
-                devices.append(device)
-        # pass on archived datasets
-        except KeyError as e:
-            continue
-    return devices
-
-
-def get_cloudvision_devices_by_sn(sn):
-    """Get a device hostname given a device id."""
-    clnt = connect_cvp()
-    url = "/api/resources/inventory/v1/Device/all"
-    device_data = clnt.get(url)
-    for device in device_data["data"]:
-        try:
-            if device["result"]["value"]["key"]["deviceId"] == sn:
-                return device["result"]["value"]["hostname"]
-        except KeyError as e:
-            continue
-
-
-def get_device_id_from_hostname(hostname):
-    """Get a device id given a hostname."""
-    clnt = connect_cvp()
-    url = "/api/resources/inventory/v1/Device/all"
-    device_data = clnt.get(url)
-    for device in device_data["data"]:
-        try:
-            if (
-                device["result"]["value"]["streamingStatus"] == "STREAMING_STATUS_ACTIVE"
-                and device["result"]["value"]["hostname"] == hostname
-            ):
-                return device["result"]["value"]["key"]["deviceId"]
-        except KeyError as e:
-            continue
-
-
-def get_device_running_configuration(device_mac_address):
-    """Get running configuration of device"""
-    clnt = connect_cvp()
-    result = clnt.api.get_device_configuration(device_mac_address)
-    return result
-
-
-def get_cloudvision_tasks():
-    """Get all tasks from cloudvision"""
-    clnt = connect_cvp()
-    result = clnt.api.get_tasks()
-    return result["data"]
-
-
-def get_cloudvision_task_logs(single_task_cc_id, single_task_stage_id):
-    """Get logs from task specified"""
-    log_list = []
-    clnt = connect_cvp()
-    result = clnt.api.get_audit_logs_by_id(single_task_cc_id, single_task_stage_id)
-    for log_entry in result["data"]:
-        log_list.insert(0, log_entry["activity"])
-    return log_list
-
-
-def prompt_for_device_or_container(action_id, help_text, dispatcher):
-    """Prompt user to select device or container."""
-    choices = [("Container", "container"), ("Device", "device")]
-    return dispatcher.prompt_from_menu(action_id, help_text, choices)
-
-
-def prompt_for_image_bundle_name_or_all(action_id, help_text, dispatcher):
-    """Prompt user to select device or container or `all`."""
-    choices = [("Bundle", "bundle"), ("All", "all")]
-    return dispatcher.prompt_from_menu(action_id, help_text, choices)
-
-
-def get_container_id_by_name(name):
-    """Get container id."""
-    clnt = connect_cvp()
-    result = clnt.get(f"/inventory/containers?name={name}")
-    return result[0]["Key"]
-
-
-def get_applied_configlets_container_id(container_id):
-    """Get a list of applied configlets."""
-    clnt = connect_cvp()
-    result = clnt.api.get_configlets_by_container_id(container_id)
-    return [configlet["name"] for configlet in result["configletList"]]
-
-
-def get_applied_configlets_device_id(device_name, device_list):
-    """Get configlets applied to device."""
-    clnt = connect_cvp()
-    chosen_device = next(device for device in device_list if device["hostname"] == device_name)
-    result = clnt.api.get_configlets_by_device_id(chosen_device["systemMacAddress"])
-    return [configlet["name"] for configlet in result]
-
+    return dispatcher.image_element(
+        dispatcher.static_url(CVP_LOGO_PATH), alt_text=CVP_LOGO_ALT
+    )
 
 def prompt_for_events_filter(action_id, help_text, dispatcher):
     """Prompt user to select how to filter events."""
@@ -175,6 +35,141 @@ def prompt_for_events_filter(action_id, help_text, dispatcher):
     ]
     return dispatcher.prompt_from_menu(action_id, help_text, choices)
 
+def prompt_for_device_or_container(action_id, help_text, dispatcher):
+    """Prompt user to select device or container."""
+    choices = [
+        ("Container", "container"),
+        ("Device", "device")
+    ]
+    return dispatcher.prompt_from_menu(action_id, help_text, choices)
+
+def prompt_for_image_bundle_name_or_all(action_id, help_text, dispatcher):
+    """Prompt user to select device or container or `all`."""
+    choices = [
+        ("Bundle", "bundle"),
+        ("All", "all")
+    ]
+    return dispatcher.prompt_from_menu(action_id, help_text, choices)
+
+def connect_cvp():
+    if not CVAAS_TOKEN:
+        token_request = requests.post("https://" + CVP_HOST + "/cvpservice/login/authenticate.do", auth=(CVP_USERNAME, CVP_PASSWORD))
+        CVP_TOKEN = token_request.json()["sessionId"]
+        clnt = CvpClient()
+        clnt.connect([CVP_HOST], CVP_USERNAME, CVP_PASSWORD)
+        return clnt
+    clnt = CvpClient()
+    clnt.connect(['www.arista.io'], username='', password='', is_cvaas=True, api_token=CVAAS_TOKEN)
+    return clnt
+
+def get_cloudvision_container_devices(container_name):
+    """Get devices from specified container"""
+    clnt = connect_cvp()
+    result = clnt.api.get_devices_in_container(container_name)
+    return result
+
+def get_cloudvision_containers():
+    """Get list of all containers from CVP"""
+    clnt = connect_cvp()
+    result = clnt.api.get_containers()
+    return result['data']
+
+def get_cloudvision_configlets_names():
+    """Get name of configlets"""
+    clnt = connect_cvp()
+    result = clnt.api.get_configlets()
+    return result['data']
+
+def get_configlet_config(configlet_name):
+    """Get configlet config lines"""
+    clnt = connect_cvp()
+    result = clnt.api.get_configlet_by_name(configlet_name)
+    return result['config']
+
+def get_cloudvision_devices_all():
+    """Get all devices in Cloudvision"""
+    clnt = connect_cvp()
+    result = clnt.get('/inventory/devices')
+    return result
+
+def get_cloudvsion_devices_all_resource():
+    """Get all devices in Cloudvision via resource API"""
+    clnt = connect_cvp()
+    dev_url = '/api/resources/inventory/v1/Device/all'
+    devices_data = clnt.get(dev_url)
+    devices = []
+    for device in devices_data['data']:
+        try:
+            if device['result']['value']['streamingStatus'] == "STREAMING_STATUS_ACTIVE":
+                devices.append(device)
+        # pass on archived datasets
+        except KeyError as e:
+            continue
+    return devices
+
+def get_cloudvision_devices_by_sn(sn):
+    """Get a device hostname given a device id."""
+    clnt = connect_cvp()
+    url = "/api/resources/inventory/v1/Device/all"
+    device_data = clnt.get(url)
+    for device in device_data["data"]:
+        try:
+            if device['result']['value']['key']['deviceId'] == sn:
+                return device['result']['value']['hostname']
+        except KeyError as e:
+            continue
+
+def get_device_id_from_hostname(hostname):
+    """Get a device id given a hostname."""
+    clnt = connect_cvp()
+    url = "/api/resources/inventory/v1/Device/all"
+    device_data = clnt.get(url)
+    for device in device_data["data"]:
+        try:
+            if device['result']['value']['streamingStatus'] == "STREAMING_STATUS_ACTIVE" and device['result']['value']["hostname"] == hostname:
+                return device['result']['value']['key']['deviceId']
+        except KeyError as e:
+            continue
+
+def get_device_running_configuration(device_mac_address):
+    """Get running configuration of device"""
+    clnt = connect_cvp()
+    result = clnt.api.get_device_configuration(device_mac_address)
+    return result
+
+def get_cloudvision_tasks():
+    """Get all tasks from cloudvision"""
+    clnt = connect_cvp()
+    result = clnt.api.get_tasks()
+    return result['data']
+
+def get_cloudvision_task_logs(single_task_cc_id, single_task_stage_id):
+    """Get logs from task specified"""
+    log_list = []
+    clnt = connect_cvp()
+    result = clnt.api.get_audit_logs_by_id(single_task_cc_id, single_task_stage_id)
+    for log_entry in result['data']:
+        log_list.insert(0, log_entry["activity"])
+    return log_list
+
+def get_container_id_by_name(name):
+    """Get container id."""
+    clnt = connect_cvp()
+    result = clnt.get(f"/inventory/containers?name={name}")
+    return result[0]["Key"]
+
+def get_applied_configlets_container_id(container_id):
+    """Get a list of applied configlets."""
+    clnt = connect_cvp()
+    result = clnt.api.get_configlets_by_container_id(container_id)
+    return [configlet["name"] for configlet in result["configletList"]]
+
+def get_applied_configlets_device_id(device_name, device_list):
+    """Get configlets applied to device."""
+    clnt = connect_cvp()
+    chosen_device = next(device for device in device_list if device["hostname"] == device_name)
+    result = clnt.api.get_configlets_by_device_id(chosen_device["systemMacAddress"])
+    return [configlet["name"] for configlet in result]
 
 def get_severity_choices():
     """Severity levels used for get-events command."""
@@ -187,7 +182,6 @@ def get_severity_choices():
     ]
     return choices
 
-
 def get_severity_events(filter_value):
     """Gets events based on severity filter."""
     clnt = connect_cvp()
@@ -196,17 +190,19 @@ def get_severity_events(filter_value):
     result = clnt.post(event_url, data=payload)
     return result["data"]
 
-
-def get_active_events_data(apiserverAddr=API_SERVER_ADDR, token=TOKEN_FILE_PATH, certs=None, key=None, ca=None):
+def get_active_events_data(apiserverAddr=CVAAS_ADDR, token=TOKEN_FILE_PATH, certs=None, key=None, ca=None):
     """Gets a list of active event types from CVP."""
     current_list = []
     pathElts = [
         "events",
         "activeEvents",
     ]
-    query = [create_query([(pathElts, [])], "analytics")]
+    query = [
+        create_query([(pathElts, [])], "analytics")
+    ]
     events = []
-    with GRPCClient(apiserverAddr, token=token, key=key, ca=ca, certs=certs) as client:
+    with GRPCClient(apiserverAddr, token=token, key=key,
+                    ca=ca, certs=certs) as client:
         for batch in client.get(query):
             for notif in batch["notifications"]:
                 for info in notif["updates"].values():
@@ -218,22 +214,15 @@ def get_active_events_data(apiserverAddr=API_SERVER_ADDR, token=TOKEN_FILE_PATH,
                     events.append(single_event)
     return events
 
-
-def get_active_events_data_filter(
-    filter_type,
-    filter_value,
-    start_time,
-    end_time,
-    apiserverAddr=API_SERVER_ADDR,
-    token=TOKEN_FILE_PATH,
-    certs=None,
-    key=None,
-    ca=None,
-):
+def get_active_events_data_filter(filter_type, filter_value, start_time, end_time, apiserverAddr=CVAAS_ADDR, token=TOKEN_FILE_PATH, certs=None, key=None, ca=None):
     """Gets a list of active event types from CVP in a specific time range."""
     start = Timestamp()
-    start_ts = datetime.fromisoformat(start_time)
+    if isinstance(start_time, str):
+        start_ts = datetime.fromisoformat(start_time)
+    else:
+        start_ts = start_time
     start.FromDatetime(start_ts)
+
 
     end = Timestamp()
     end_ts = datetime.fromisoformat(end_time)
@@ -244,9 +233,12 @@ def get_active_events_data_filter(
         "events",
         "activeEvents",
     ]
-    query = [create_query([(pathElts, [])], "analytics")]
+    query = [
+        create_query([(pathElts, [])], "analytics")
+    ]
     events = []
-    with GRPCClient(apiserverAddr, token=token, key=key, ca=ca, certs=certs) as client:
+    with GRPCClient(apiserverAddr, token=token, key=key,
+                    ca=ca, certs=certs) as client:
         for batch in client.get(query, start=start, end=end):
             for notif in batch["notifications"]:
                 for info in notif["updates"].values():
@@ -267,39 +259,38 @@ def get_active_events_data_filter(
 
     return events
 
-
-def get_active_severity_types(apiserverAddr=API_SERVER_ADDR, token=TOKEN_FILE_PATH, certs=None, key=None, ca=None):
+def get_active_severity_types(apiserverAddr=CVAAS_ADDR, token=TOKEN_FILE_PATH, certs=None, key=None, ca=None):
     """Gets a list of active event types from CVP."""
     current_list = []
     pathElts = [
         "events",
         "type",
     ]
-    query = [create_query([(pathElts, [])], "analytics")]
+    query = [
+        create_query([(pathElts, [])], "analytics")
+    ]
     event_types = []
-    with GRPCClient(apiserverAddr, token=token, key=key, ca=ca, certs=certs) as client:
+    with GRPCClient(apiserverAddr, token=token, key=key,
+                    ca=ca, certs=certs) as client:
         for batch in client.get(query):
             for notif in batch["notifications"]:
                 for info in notif["updates"]:
                     event_types.append(info)
     return event_types
 
-
 def get_applied_tags(device_id):
     """Get tags applied to device by device id."""
     clnt = connect_cvp()
-    tag_url = "/api/resources/tag/v1/InterfaceTagAssignmentConfig/all"
+    tag_url = '/api/resources/tag/v1/InterfaceTagAssignmentConfig/all'
     payload = {"partialEqFilter": [{"key": {"deviceId": device_id}}]}
     result = clnt.post(tag_url, data=payload)
     return result
-
 
 def get_image_bundles(image_bundle_name=None):
     """Get image bundle from cloudvision"""
     clnt = connect_cvp()
     result = clnt.api.get_image_bundles()
     return result["data"]
-
 
 def get_images(image_bundle_name=None):
     """Get images that are on Cloudvision."""
@@ -309,9 +300,7 @@ def get_images(image_bundle_name=None):
         return result["data"]
     else:
         combined_applied = {}
-        url_containers = (
-            f"/image/getImageBundleAppliedContainers.do?imageName={image_bundle_name}&startIndex=0&endIndex=0"
-        )
+        url_containers = f"/image/getImageBundleAppliedContainers.do?imageName={image_bundle_name}&startIndex=0&endIndex=0"
         url_devices = f"/image/getImageBundleAppliedDevices.do?imageName={image_bundle_name}&startIndex=0&endIndex=0"
         result_containers = clnt.get(url_containers)
         result_devices = clnt.get(url_devices)
@@ -319,30 +308,35 @@ def get_images(image_bundle_name=None):
         combined_applied["devices"] = result_devices["data"]
         return combined_applied
 
-
-def get_device_bugs_data(
-    device_id, apiserverAddr=API_SERVER_ADDR, token=TOKEN_FILE_PATH, certs=None, key=None, ca=None
-):
+def get_device_bugs_data(device_id, apiserverAddr=CVAAS_ADDR, token=TOKEN_FILE_PATH, certs=None, key=None, ca=None):
     """Get bugs associated with a device."""
-    pathElts = ["tags", "BugAlerts", "devices"]
-    query = [create_query([(pathElts, [])], "analytics")]
+    pathElts = [
+        "tags",
+        "BugAlerts",
+        "devices"
+    ]
+    query = [
+        create_query([(pathElts, [])], "analytics")
+    ]
     bugs = []
-    with GRPCClient(apiserverAddr, token=token, key=key, ca=ca, certs=certs) as client:
+    with GRPCClient(apiserverAddr, token=token, key=key,
+                    ca=ca, certs=certs) as client:
         for batch in client.get(query):
             for notif in batch["notifications"]:
-                if notif["updates"].get(device_id):
-                    return notif["updates"].get(device_id)
+                    if notif["updates"].get(device_id):
+                        return notif["updates"].get(device_id)
     return bugs
 
-
-def get_bug_info(bug_id, apiserverAddr=API_SERVER_ADDR, token=TOKEN_FILE_PATH):
+def get_bug_info(bug_id, apiserverAddr=CVAAS_ADDR, token=TOKEN_FILE_PATH):
     """Get detailed information about a bug given its identifier."""
     pathElts = [
         "BugAlerts",
         "bugs",
         int(bug_id),
     ]
-    query = [create_query([(pathElts, [])], "analytics")]
+    query = [
+        create_query([(pathElts, [])], "analytics")
+    ]
     bug_info = {}
     with GRPCClient(apiserverAddr, token=token) as client:
         for batch in client.get(query):
@@ -352,3 +346,19 @@ def get_bug_info(bug_id, apiserverAddr=API_SERVER_ADDR, token=TOKEN_FILE_PATH):
                 bug_info["severity"] = notif["updates"]["severity"]
                 bug_info["versions_fixed"] = notif["updates"]["versionFixed"]
     return bug_info
+
+def get_bug_device_report(apiserverAddr=CVAAS_ADDR, token=CVAAS_TOKEN):
+    """Get how many bugs each device has."""
+    pathElts = [
+        "BugAlerts",
+        "DevicesBugsCount"
+    ]
+    query = [
+        create_query([(pathElts, [])], "analytics")
+    ]
+    bug_count = {}
+    with GRPCClient(apiserverAddr, tokenValue=token) as client:
+        for batch in client.get(query):
+            for notif in batch["notifications"]:
+                    bug_count = notif["updates"]
+    return bug_count
