@@ -262,7 +262,7 @@ def get_active_events_data(apiserverAddr=None, token=None, certs=None, key=None,
 def get_active_events_data_filter(
     filter_type, filter_value, start_time, end_time, apiserverAddr=None, token=None, certs=None, key=None, ca=None
 ):
-    # pylint: disable=invalid-name,too-many-arguments,too-many-locals,too-many-branches
+    # pylint: disable=invalid-name,too-many-arguments,too-many-locals,too-many-branches,no-member
     """Gets a list of active event types from CVP in a specific time range."""
     if on_prem:
         apiserverAddr = CVP_HOST

@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 import os
 from django_rq import job
 from django.conf import settings
-from nautobot_chatops.workers import subcommand_of, handle_subcommands
-from nautobot_chatops.choices import CommandStatusChoices
+from nautobot_chatops.workers import subcommand_of, handle_subcommands  # pylint: disable=import-error
+from nautobot_chatops.choices import CommandStatusChoices  # pylint: disable=import-error
 from .utils import (
     prompt_for_events_filter,
     prompt_for_device_or_container,
