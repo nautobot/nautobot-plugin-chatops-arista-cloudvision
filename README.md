@@ -1,45 +1,57 @@
 # Nautobot Chatops Extension Arista
 
-A plugin for [Nautobot](https://github.com/nautobot/nautobot).
+An extension for [Nautobot](https://github.com/nautobot/nautobot) [Chatops Plugin](https://github.com/nautobot/nautobot-plugin-chatops/)
 
-## Installation
+### Build Status
 
-The plugin is available as a Python package in pypi and can be installed with pip
+| Branch      | Status |
+|-------------|------------|
+| **main** | [![Build Status](https://travis-ci.com/networktocode-llc/nautobot-chatops-extension-cloudvision.svg?token=BknroZ7vxquiYcUvP8RC&branch=main)](https://travis-ci.com/networktocode-llc/nautobot-chatops-extension-cloudvision) |
+| **develop** | [![Build Status](https://travis-ci.com/networktocode-llc/nautobot-chatops-extension-cloudvision.svg?token=BknroZ7vxquiYcUvP8RC&branch=develop)](https://travis-ci.com/networktocode-llc/nautobot-chatops-extension-cloudvision) |
+
+The extension is available as a Python package in PyPI and can be installed with pip
 
 ```shell
-pip install nautobot-chatops-extension-arista
+pip install git+https://github.com/networktocode-llc/nautobot-chatops-extension-cloudvision.git
 ```
 
-> The plugin is compatible with Nautobot 1.0.0 and higher
+This ChatOps Extension to Nautobot ChatOps Plugin requires environment variables to be set up depending on if you are using a CVAAS (Cloudvision as a Service) or Cloudvision on-premise.
 
-To ensure Nautobot Chatops Extension Arista is automatically re-installed during future upgrades, create a file named `local_requirements.txt` (if not already existing) in the Nautobot root directory (alongside `requirements.txt`) and list the `nautobot-chatops-extension-arista` package:
+For CVAAS the following environment variables must be set.
 
-```no-highlight
-# echo nautobot-chatops-extension-arista >> local_requirements.txt
+- `CVAAS_TOKEN`: Token generated from CVAAS service account. Documentation for that process can be found [here](https://www.arista.com/assets/data/pdf/qsg/qsg-books/QS_CloudVision_as_a_Service.pdf) in section 1.7
+
+For on premise instance of Cloudvision, these environment variables must be set.
+
+- `CVP_USERNAME`: The username that will be used to authenticate to Cloudvision.
+- `CVP_PASSWORD`: The password for the configured username.
+- `CVP_HOST`: The IP or hostname of the on premise Cloudvision appliance.
+- `CVP_INSECURE`: If this is set to `True`, the appliance cert will be downloaded and automatically trusted. Otherwise, the appliance is expected to have a valid certificate.
+- `ON_PREM`: By default this is set to False, this must be changed to `True` if using an on-prem instance of Cloudvision.
+
+Once you have updated your environment file, restart both nautobot and nautobot-worker
+
 ```
-
-Once installed, the plugin needs to be enabled in your `nautobot_configuration.py`
-
-```python
-# In your configuration.py
-PLUGINS = ["nautobot_chatops_extension_arista"]
-
-# PLUGINS_CONFIG = {
-#   "nautobot_chatops_extension_arista": {
-#     ADD YOUR SETTINGS HERE
-#   }
-# }
+$ sudo systemctl restart nautobot nautobot-worker
 ```
-
-The plugin behavior can be controlled with the following list of settings
-
-- TODO
 
 ## Usage
 
-### API
+### Command setup
 
-TODO
+Add a slash command to Slack called `/cloudvision`.
+See the [nautobot-chatops installation guide](https://github.com/nautobot/nautobot-plugin-chatops/blob/develop/docs/chat_setup.md) for instructions on adding a slash command to your Slack channel.
+
+The following commands are available:
+
+- `get-devices-in-container [container-name]`: Retrieves all the devices assigned to the specificied container.
+- `get-configlet [configlet-name]`: Get the configuration of the specified configlet.
+- `get-device-configuration [device-name]`: Get the configuration of the specified device.
+- `get-task-logs [task-id]`: Get the logs of the specified task.
+- `get-applied-configlets [filter-type] [filter-value]`: Get applied configlets to either a specified container or device.
+- `get-active-events [filter-type] [filter-value] [start-time] [end-time]`: Get active events in a given time frame. Filter-type can be filtered by device, type or severity. Filter-value is dynamically created based on the filter-type. Start-time accepts ISO time format as well as relative time inputs. Examples of that are  `-2w`, `-2d`, `-2h` which will go back two weeks, two days and two hours, respectively.
+- `get-applied-image-bundles [filter-type] [image-bundle-name]`: Gets the devices and containers an image bundle is applied to. Can also specify the `all` parameter to get a list of all the image bundles on Cloudvision.
+- `get-device-cve [device-name]`: Gets all the CVEs of the specified device. Can also specifiy the `all` parameter to get a count of CVE account for each device.
 
 ## Contributing
 
@@ -89,7 +101,7 @@ nautobot_chatops_extension_arista:
 poetry shell
 poetry install --extras nautobot
 export $(cat development/dev.env | xargs)
-export $(cat development/creds.env | xargs) 
+export $(cat development/creds.env | xargs)
 invoke start && sleep 5
 nautobot-server migrate
 ```
@@ -167,7 +179,3 @@ Project documentation is generated by [mkdocs](https://www.mkdocs.org/) from the
 
 For any questions or comments, please check the [FAQ](FAQ.md) first and feel free to swing by the [Network to Code slack channel](https://networktocode.slack.com/) (channel #networktocode).
 Sign up [here](http://slack.networktocode.com/)
-
-## Screenshots
-
-TODO
