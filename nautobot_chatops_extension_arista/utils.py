@@ -110,14 +110,7 @@ def get_cloudvision_devices_all():
     return result
 
 
-def get_cloudvision_ztp_all():
-    """Get all ztp devices in Cloudvision."""
-    clnt = connect_cvp()
-    result = clnt.get("/ztp/getAllNetElementList.do")
-    return result
-
-
-def get_cloudvsion_devices_all_resource():
+def get_cloudvision_devices_all_resource():
     """Get all devices in Cloudvision via resource API."""
     clnt = connect_cvp()
     dev_url = "/api/resources/inventory/v1/Device/all"
