@@ -6,16 +6,16 @@ from django_rq import job
 from django.conf import settings
 from nautobot_chatops.workers import subcommand_of, handle_subcommands  # pylint: disable=import-error
 from nautobot_chatops.choices import CommandStatusChoices  # pylint: disable=import-error
+import nautobot_chatops_extension_arista.cvpgrpcutils as grpcutils
 from .utils import (
     prompt_for_events_filter,
     prompt_for_device_or_container,
-    prompt_for_image_bundle_name_or_all,
     get_cloudvision_container_devices,
     get_cloudvision_containers,
     get_cloudvision_configlets_names,
     get_configlet_config,
     get_cloudvision_devices_all,
-    get_cloudvsion_devices_all_resource,
+    get_cloudvision_devices_all_resource,
     get_cloudvision_devices_by_sn,
     get_device_id_from_hostname,
     get_device_running_configuration,
@@ -28,8 +28,6 @@ from .utils import (
     get_active_events_data,
     get_active_events_data_filter,
     get_active_severity_types,
-    get_image_bundles,
-    get_images,
     get_device_bugs_data,
     get_bug_info,
     get_bug_device_report,
@@ -38,7 +36,7 @@ from .utils import (
 
 logger = logging.getLogger("rq.worker")
 dir_path = os.path.dirname(os.path.realpath(__file__))
-on_prem = settings.PLUGINS_CONFIG["arista_chatops"].get("on_prem")
+PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_plugin_chatops_cloudvision"]
 
 
 def cloudvision_logo(dispatcher):
@@ -47,16 +45,20 @@ def cloudvision_logo(dispatcher):
 
 
 def check_credentials(dispatcher):
-    """Checks that Cloudvision credentials are set."""
-    if on_prem:
-        if not os.getenv("CVP_USERNAME") and not os.getenv("CVP_PASSWORD") and not os.getenv("CV_HOSTNAME_OR_IP"):
+    """Check whether to use on prem or cloud instance of Cloudvision."""
+    if PLUGIN_SETTINGS.get("on_prem"):
+        if (
+            not PLUGIN_SETTINGS.get("cvp_username")
+            and not PLUGIN_SETTINGS.get("cvp_password")
+            and not PLUGIN_SETTINGS.get("cvp_url")
+        ):
             dispatcher.send_warning(
-                "Please ensure environment variables CVP_USERNAME, CVP_PASSWORD and CVP_HOSTNAME_OR_IP are set."
+                "Please ensure plugin config variables cvp_username, cvp_password and cvp_url are set."
             )
             return False
     else:
-        if not os.getenv("NAUTOBOT_CHATOPS_CVAAS_TOKEN"):
-            dispatcher.send_warning("Please ensure either environment variable NAUTOBOT_CHATOPS_CVAAS_TOKEN is set.")
+        if not PLUGIN_SETTINGS.get("cvaas_token"):
+            dispatcher.send_warning("Please ensure plugin config variable cvaas_token is set.")
             return False
     return True
 
@@ -297,7 +299,7 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
         if filter_type == "severity":
             choices = get_severity_choices()
         elif filter_type == "device":
-            device_list = get_cloudvsion_devices_all_resource()
+            device_list = get_cloudvision_devices_all_resource()
             choices = [
                 (device["result"]["value"]["hostname"], device["result"]["value"]["hostname"]) for device in device_list
             ]
@@ -393,73 +395,33 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
 
 
 @subcommand_of("cloudvision")
-def get_applied_image_bundles(dispatcher, filter_type=None, image_bundle_name=None):
-    """Get image bundle applied to device. Choose 'all' to get all image bundles from Cloudvision."""
+def get_tags(dispatcher, device_name=None):
+    """Get system or user tags assigned to a device."""
     if not check_credentials(dispatcher):
         return CommandStatusChoices.STATUS_FAILED
 
-    if not filter_type:
-        prompt_for_image_bundle_name_or_all(
-            "cloudvision get-applied-image-bundles",
-            "Select an image bundle name to get all devices and containers that have that image bundle applied. Choose 'all' to get all image bundles on Cloudvision.",
-            dispatcher,
-        )
-        return False
-
-    if filter_type == "all":
-        dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting all image bundles in Cloudvision.")
-        image_bundles = get_image_bundles()
-
-        header = ["Bundle Name", "Is Certified", "Images in Bundle", "Applied Container Count", "Applied Device Count"]
-        rows = [
-            (
-                bundle["name"],
-                bundle["isCertifiedImageBundle"],
-                ",".join(bundle["imageIds"]),
-                bundle["appliedContainersCount"],
-                bundle["appliedDevicesCount"],
-            )
-            for bundle in image_bundles
+    if not device_name:
+        device_list = get_cloudvision_devices_all_resource()
+        choices = [
+            (device["result"]["value"]["hostname"], device["result"]["value"]["hostname"]) for device in device_list
         ]
 
-        dispatcher.send_large_table(header, rows)
-        return CommandStatusChoices.STATUS_SUCCEEDED
-
-    if not image_bundle_name:
-        images = get_images()
-        choices = [(x["name"], x["name"]) for x in images]
-
-        dispatcher.prompt_from_menu(
-            f"cloudvision get-applied-image-bundles {filter_type}", "Select an image bundle.", choices
-        )
+        dispatcher.prompt_from_menu("cloudvision get-tags", "Select a device.", choices)
         return False
 
-    dispatcher.send_markdown(
-        f"Stand by {dispatcher.user_mention()}, I'm getting devices and containers that have the {image_bundle_name} applied."
-    )
+    dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting the tags for {device_name}.")
 
-    applied_dictionary = get_images(image_bundle_name=image_bundle_name)
-    if not applied_dictionary["containers"] and not applied_dictionary["devices"]:
-        dispatcher.send_warning(f"There are no devices or containers with {image_bundle_name} applied.")
-        return CommandStatusChoices.STATUS_FAILED
-
-    applied_containers_list = []
-    for entity in applied_dictionary["containers"]:
-        applied_containers_list.append({"type": "container", "name": entity["containerName"]})
-
-    combined = applied_containers_list
+    device_id = get_device_id_from_hostname(device_name)
+    tags = grpcutils.get_device_tags(device_id, PLUGIN_SETTINGS)
 
     dispatcher.send_blocks(
         dispatcher.command_response_header(
-            "cloudvision",
-            "get-applied-image-bundles",
-            [("Filter type", filter_type), ("Image Bundle", image_bundle_name)],
-            "information",
+            "cloudvision", "get-tags", [("Device Name", device_name)], "information", cloudvision_logo(dispatcher)
         )
     )
 
-    header = ["Bundle Name", "Applied to", "Device/Container"]
-    rows = [(image_bundle_name, entity["name"], entity["type"]) for entity in combined]
+    header = ["Label", "Value"]
+    rows = [(tag.get("label"), tag.get("value")) for tag in tags]
 
     dispatcher.send_large_table(header, rows)
     return CommandStatusChoices.STATUS_SUCCEEDED
@@ -472,7 +434,7 @@ def get_device_cve(dispatcher, device_name=None):
         return CommandStatusChoices.STATUS_FAILED
 
     if not device_name:
-        device_list = get_cloudvsion_devices_all_resource()
+        device_list = get_cloudvision_devices_all_resource()
         choices = [
             (device["result"]["value"]["hostname"], device["result"]["value"]["hostname"]) for device in device_list
         ]
