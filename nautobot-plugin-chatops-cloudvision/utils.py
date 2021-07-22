@@ -10,7 +10,6 @@ from django.conf import settings
 
 fullpath = os.path.abspath(__file__)
 directory = os.path.dirname(fullpath)
-on_prem = settings.PLUGINS_CONFIG["arista_chatops"].get("on_prem")
 
 CVAAS_TOKEN = os.getenv("NAUTOBOT_CHATOPS_CVAAS_TOKEN")
 CVAAS_ADDR = "apiserver.arista.io:443"
