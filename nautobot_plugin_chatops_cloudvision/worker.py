@@ -6,7 +6,7 @@ from django_rq import job
 from django.conf import settings
 from nautobot_chatops.workers import subcommand_of, handle_subcommands  # pylint: disable=import-error
 from nautobot_chatops.choices import CommandStatusChoices  # pylint: disable=import-error
-import nautobot_chatops_extension_arista.cvpgrpcutils as grpcutils
+import nautobot_plugin_chatops_cloudvision.cvpgrpcutils as grpcutils
 from .utils import (
     prompt_for_events_filter,
     prompt_for_device_or_container,

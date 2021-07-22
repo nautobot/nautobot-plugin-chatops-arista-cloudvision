@@ -73,7 +73,7 @@ The development environment can be used in 2 ways. First, with a local poetry en
 The [PyInvoke](http://www.pyinvoke.org/) library is used to provide some helper commands based on the environment.  There are a few configuration parameters which can be passed to PyInvoke to override the default configuration:
 
 * `nautobot_ver`: the version of Nautobot to use as a base for any built docker containers (default: 1.0.1)
-* `project_name`: the default docker compose project name (default: nautobot_chatops_extension_arista)
+* `project_name`: the default docker compose project name (default: nautobot_plugin_chatops_cloudvision)
 * `python_ver`: the version of Python to use as a base for any built docker containers (default: 3.6)
 * `local`: a boolean flag indicating if invoke tasks should be run on the host or inside the docker containers (default: False, commands will be run in docker containers)
 * `compose_dir`: the full path to a directory containing the project compose files
@@ -89,7 +89,7 @@ Using PyInvoke these configuration options can be overridden using [several meth
 
 ```shell
 ---
-nautobot_chatops_extension_arista:
+nautobot_plugin_chatops_cloudvision:
   local: true
   compose_files:
     - "docker-compose.requirements.yml"
@@ -137,7 +137,7 @@ Nautobot server can now be accessed at [http://localhost:8080](http://localhost:
 
 The project is coming with a CLI helper based on [invoke](http://www.pyinvoke.org/) to help setup the development environment. The commands are listed below in 3 categories `dev environment`, `utility` and `testing`.
 
-Each command can be executed with `invoke <command>`. Environment variables `INVOKE_NAUTOBOT_CHATOPS_EXTENSION_ARISTA_PYTHON_VER` and `INVOKE_NAUTOBOT_CHATOPS_EXTENSION_ARISTA_NAUTOBOT_VER` may be specified to override the default versions. Each command also has its own help `invoke <command> --help`
+Each command can be executed with `invoke <command>`. Environment variables `INVOKE_NAUTOBOT_CHATOPS_PLUGIN_CLOUDVISION_PYTHON_VER` and `INVOKE_NAUTOBOT_CHATOPS_PLUGIN_CLOUDVISION_NAUTOBOT_VER` may be specified to override the default versions. Each command also has its own help `invoke <command> --help`
 
 #### Docker dev environment
 
