@@ -60,6 +60,27 @@ PLUGINS_CONFIG = {
 }
 ```
 
+After that, you must update environment variables depending on if you are using a CVAAS (Cloudvision as a Service) or Cloudvision on-premise. To update environment variables in Nautobot check out our blog post [here](http://blog.networktocode.com/post/creating-custom-chat-commands-using-nautobot-chatops/)
+
+For CVAAS the following environment variables must be set.
+
+- `CVAAS_TOKEN`: Token generated from CVAAS service account. Documentation for that process can be found [here](https://www.arista.com/assets/data/pdf/qsg/qsg-books/QS_CloudVision_as_a_Service.pdf) in section 1.7
+
+For on premise instance of Cloudvision, these environment variables must be set.
+
+- `CVP_USERNAME`: The username that will be used to authenticate to Cloudvision.
+- `CVP_PASSWORD`: The password for the configured username.
+- `CVP_HOST`: The IP or hostname of the on premise Cloudvision appliance.
+- `CVP_INSECURE`: If this is set to `True`, the appliance cert will be downloaded and automatically trusted. Otherwise, the appliance is expected to have a valid certificate.
+- `ON_PREM`: By default this is set to False, this must be changed to `True` if using an on-prem instance of Cloudvision.
+
+Once you have updated your environment file, restart both nautobot and nautobot-worker
+
+```
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart nautobot nautobot-worker
+```
+
 ### Command setup
 
 Add a slash command to Slack called `/cloudvision`.
