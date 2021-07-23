@@ -53,12 +53,12 @@ def check_credentials(dispatcher):
             and not PLUGIN_SETTINGS.get("cvp_url")
         ):
             dispatcher.send_warning(
-                "Please ensure plugin config variables cvp_username, cvp_password and cvp_url are set."
+                "Please ensure environment variables CVP_USERNAME, CVP_PASSWORD and CVP_URL are set."
             )
             return False
     else:
         if not PLUGIN_SETTINGS.get("cvaas_token"):
-            dispatcher.send_warning("Please ensure plugin config variable cvaas_token is set.")
+            dispatcher.send_warning("Please ensure environment variable CVAAS_TOKEN is set.")
             return False
     return True
 

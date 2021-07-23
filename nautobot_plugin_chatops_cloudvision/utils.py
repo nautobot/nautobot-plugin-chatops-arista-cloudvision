@@ -20,7 +20,8 @@ CVAAS_TOKEN_PATH = f"{directory}/cvaas_token.txt"
 CVP_USERNAME = PLUGIN_SETTINGS.get("CVP_USERNAME")
 CVP_PASSWORD = PLUGIN_SETTINGS.get("CVP_PASSWORD")
 CVP_HOST = PLUGIN_SETTINGS.get("CVP_HOST")
-CVP_INSECURE = PLUGIN_SETTINGS.get("ON_PREM")
+CVP_INSECURE = PLUGIN_SETTINGS.get("CVP_INSECURE")
+ON_PREM = PLUGIN_SETTINGS.get("ON_PREM")
 CVP_TOKEN_PATH = f"{directory}/token.txt"
 CRT_FILE_PATH = f"{directory}/cvp.crt"
 
@@ -59,11 +60,9 @@ def prompt_for_image_bundle_name_or_all(action_id, help_text, dispatcher):
 
 def connect_cvp():
     """Connect to an instance of Cloudvision."""
-    if on_prem:
+    if ON_PREM:
         clnt = CvpClient()
         clnt.connect([CVP_HOST], CVP_USERNAME, CVP_PASSWORD)
-        with open("cvp.crt", "w") as file:
-            file.write(ssl.get_server_certificate((CVP_HOST, 443)))
         token_request = requests.post(
             f"https://{CVP_HOST}/cvpservice/login/authenticate.do",
             auth=(CVP_USERNAME, CVP_PASSWORD),
@@ -71,6 +70,9 @@ def connect_cvp():
         )
         with open("cvp_token.txt", "w") as file:
             file.write(token_request.json()["sessionId"])
+        if CVP_INSECURE:
+            with open("cvp.crt", "w") as file:
+                file.write(ssl.get_server_certificate((CVP_HOST, 443)))
     else:
         clnt = CvpClient()
         clnt.connect(["www.arista.io"], username="", password="", is_cvaas=True, api_token=CVAAS_TOKEN)  # nosec
@@ -229,7 +231,7 @@ def get_severity_events(filter_value):
 def get_active_events_data(apiserverAddr=None, token=None, certs=None, key=None, ca=None):
     # pylint: disable=invalid-name
     """Gets a list of active event types from CVP."""
-    if on_prem:
+    if ON_PREM:
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
@@ -259,7 +261,7 @@ def get_active_events_data_filter(
 ):
     # pylint: disable=invalid-name,too-many-arguments,too-many-locals,too-many-branches,no-member
     """Gets a list of active event types from CVP in a specific time range."""
-    if on_prem:
+    if ON_PREM:
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
@@ -307,7 +309,7 @@ def get_active_events_data_filter(
 def get_active_severity_types(apiserverAddr=None, token=None, certs=None, key=None, ca=None):
     """Gets a list of active event types from CVP."""
     # pylint: disable=invalid-name
-    if on_prem:
+    if ON_PREM:
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
@@ -362,7 +364,7 @@ def get_images(image_bundle_name=None):
 def get_device_bugs_data(device_id, apiserverAddr=None, token=None, certs=None, key=None, ca=None):
     """Get bugs associated with a device."""
     # pylint: disable=invalid-name,too-many-arguments
-    if on_prem:
+    if ON_PREM:
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
@@ -382,7 +384,7 @@ def get_device_bugs_data(device_id, apiserverAddr=None, token=None, certs=None, 
 def get_bug_info(bug_id, apiserverAddr=None, token=None):
     """Get detailed information about a bug given its identifier."""
     # pylint: disable=invalid-name
-    if on_prem:
+    if ON_PREM:
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
@@ -407,7 +409,7 @@ def get_bug_info(bug_id, apiserverAddr=None, token=None):
 def get_bug_device_report(apiserverAddr=None, token=None):
     """Get how many bugs each device has."""
     # pylint: disable=invalid-name
-    if on_prem:
+    if ON_PREM:
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR

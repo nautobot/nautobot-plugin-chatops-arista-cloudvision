@@ -32,10 +32,33 @@ For on premise instance of Cloudvision, these environment variables must be set.
 Once you have updated your environment file, restart both nautobot and nautobot-worker
 
 ```
+$ sudo systemctl daemon-reload
 $ sudo systemctl restart nautobot nautobot-worker
 ```
 
 ## Usage
+
+### Nautobot Config
+
+You must first update the Nautobot configuration file with a new entry in the `PLUGINS_CONFIG` dictionary.
+
+```python
+PLUGINS_CONFIG = {
+    'nautobot_chatops': {
+        'enable_slack': True,
+        'slack_api_token': os.getenv("SLACK_API_TOKEN"),
+        'slack_signing_secret': os.getenv("SLACK_SIGNING_SECRET")
+    },
+    'nautobot_plugin_chatops_cloudvision' : {
+        'cvaas_token': os.getenv("CVAAS_TOKEN"),
+        'cvp_username': os.getenv("CVP_USERNAME"),
+        'cvp_password': os.getenv("CVP_PASSWORD"),
+        'cvp_host': os.getenv("CVP_HOST"),
+        "cvp_insecure": os.getenv("CVP_INSECURE"),
+        'on_prem': os.getenv("ON_PREM")
+    }
+}
+```
 
 ### Command setup
 
