@@ -11,16 +11,19 @@ from django.conf import settings
 fullpath = os.path.abspath(__file__)
 directory = os.path.dirname(fullpath)
 
-CVAAS_TOKEN = os.getenv("NAUTOBOT_CHATOPS_CVAAS_TOKEN")
+PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_plugin_chatops_cloudvision"]
+
+CVAAS_TOKEN = PLUGIN_SETTINGS.get("CVAAS_TOKEN")
 CVAAS_ADDR = "apiserver.arista.io:443"
 CVAAS_TOKEN_PATH = f"{directory}/cvaas_token.txt"
 
-CVP_USERNAME = os.getenv("CVP_USERNAME")
-CVP_PASSWORD = os.getenv("CVP_PASSWORD")
-CVP_HOST = os.getenv("CVP_HOSTNAME_OR_IP")
-CVP_INSECURE = os.getenv("CVP_INSECURE")
+CVP_USERNAME = PLUGIN_SETTINGS.get("CVP_USERNAME")
+CVP_PASSWORD = PLUGIN_SETTINGS.get("CVP_PASSWORD")
+CVP_HOST = PLUGIN_SETTINGS.get("CVP_HOST")
+CVP_INSECURE = PLUGIN_SETTINGS.get("ON_PREM")
 CVP_TOKEN_PATH = f"{directory}/token.txt"
 CRT_FILE_PATH = f"{directory}/cvp.crt"
+
 
 CVP_LOGO_PATH = "cloudvision/CloudvisionLogoSquare.png"
 CVP_LOGO_ALT = "Cloudvision Logo"
