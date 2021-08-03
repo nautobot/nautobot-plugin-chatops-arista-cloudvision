@@ -2,8 +2,6 @@
 
 An extension for [Nautobot](https://github.com/nautobot/nautobot) [Chatops Plugin](https://github.com/nautobot/nautobot-plugin-chatops/)
 
-### Build Status
-
 The extension is available as a Python package in PyPI and can be installed with pip
 
 ```shell
