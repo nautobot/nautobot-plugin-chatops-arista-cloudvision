@@ -4,15 +4,10 @@ An extension for [Nautobot](https://github.com/nautobot/nautobot) [Chatops Plugi
 
 ### Build Status
 
-| Branch      | Status |
-|-------------|------------|
-| **main** | [![Build Status](https://travis-ci.com/networktocode-llc/nautobot-chatops-extension-cloudvision.svg?token=BknroZ7vxquiYcUvP8RC&branch=main)](https://travis-ci.com/networktocode-llc/nautobot-chatops-extension-cloudvision) |
-| **develop** | [![Build Status](https://travis-ci.com/networktocode-llc/nautobot-chatops-extension-cloudvision.svg?token=BknroZ7vxquiYcUvP8RC&branch=develop)](https://travis-ci.com/networktocode-llc/nautobot-chatops-extension-cloudvision) |
-
 The extension is available as a Python package in PyPI and can be installed with pip
 
 ```shell
-pip install git+https://github.com/networktocode-llc/nautobot-chatops-extension-cloudvision.git
+pip install git+https://github.com/nautobot/nautobot-plugin-chatops-arista-cloudvision.git
 ```
 
 This ChatOps Extension to Nautobot ChatOps Plugin requires environment variables to be set up depending on if you are using a CVAAS (Cloudvision as a Service) or Cloudvision on-premise.
@@ -214,6 +209,14 @@ Each command can be executed with `invoke <command>`. Environment variables `INV
   tests            Run all tests for this plugin.
   unittest         Run Django unit tests for the plugin.
 ```
+
+## Screenshots
+
+![cloudvision_get_active_events](https://user-images.githubusercontent.com/38091261/128059429-4e4dc269-2113-411b-9721-9ef281a361c5.PNG)
+![cloudvision_get_configlet](https://user-images.githubusercontent.com/38091261/128059458-d6395d63-6909-4219-9dcb-dff1801cbda2.PNG)
+![cloudvision_get_device_cve](https://user-images.githubusercontent.com/38091261/128059481-2ff60896-81e4-46ae-992b-7d179403fe8f.PNG)
+
+
 
 ## Questions
 
