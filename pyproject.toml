@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "nautobot-plugin-chatops-cloudvision"
+name = "nautobot-chatops-arista-cloudvision"
 version = "0.1.0"
-description = "Nautobot Plugin Chatops Cloudvision"
+description = "Nautobot Chatops Arista Cloudvision Integration"
 authors = ["Network to Code, LLC <info@networktocode.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-homepage = "https://github.com/networktocode-llc/nautobot-plugin-chatops-cloudvision"
-repository = "https://github.com/networktocode-llc/nautobot-plugin-chatops-cloudvision"
+homepage = "https://github.com/nautobot/nautobot-plugin-chatops-arista-cloudvision"
+repository = "https://github.com/nautobot/nautobot-plugin-chatops-arista-cloudvision"
 keywords = ["nautobot", "nautobot-plugin"]
 include = [
     "LICENSE",
