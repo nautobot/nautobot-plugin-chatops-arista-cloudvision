@@ -255,18 +255,11 @@ description = "A Python library for Arista's CloudVision APIs."
 category = "main"
 optional = false
 python-versions = "*"
-develop = false
 
 [package.dependencies]
 grpcio = ">=1.30.0"
 msgpack = ">=0.6.0,<1.0.0"
 protobuf = ">=3.12.2"
-
-[package.source]
-type = "git"
-url = "https://github.com/aristanetworks/cloudvision-python.git"
-reference = "trunk"
-resolved_reference = "bbc407d310c1a2ebfd4559c4b5e25f66dd849ffe"
 
 [[package]]
 name = "colorama"
@@ -1698,7 +1691,7 @@ nautobot = ["nautobot"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "4cba1c943a13f073570151cf46ceb529b1d525ffa53c319aab8ae4fd0b72345d"
+content-hash = "67ac22c3e9a08b69d060e515e9dec6a0d8fd0345f38f9738adb6107e5e684543"
 
 [metadata.files]
 amqp = [
@@ -1814,7 +1807,10 @@ click-repl = [
     {file = "click-repl-0.2.0.tar.gz", hash = "sha256:cd12f68d745bf6151210790540b4cb064c7b13e571bc64b6957d98d120dacfd8"},
     {file = "click_repl-0.2.0-py3-none-any.whl", hash = "sha256:94b3fbbc9406a236f176e0506524b2937e4b23b6f4c0c0b2a0a83f8a64e9194b"},
 ]
-cloudvision = []
+cloudvision = [
+    {file = "cloudvision-1.1.0-py3-none-any.whl", hash = "sha256:405585ecacfb0a741a0378e1fd3b44340afdb7b1645a4a76ec1b76bce3a2b6cb"},
+    {file = "cloudvision-1.1.0.tar.gz", hash = "sha256:0b5235674381d27f4481d950db702c068c0d06c69b9e867a9b7ca45d4fbba43d"},
+]
 colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
     {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
