@@ -1,18 +1,15 @@
 # Nautobot ChatOps Extension Arista
 
-An extension for [Nautobot](https://github.com/nautobot/nautobot) [ChatOps Plugin](https://github.com/nautobot/nautobot-plugin-chatops/)
+An plugin for [Nautobot](https://github.com/nautobot/nautobot) [ChatOps Plugin](https://github.com/nautobot/nautobot-plugin-chatops/)
 
 
+## Instalation
 
 The extension is available as a Python package in PyPI and can be installed with pip
 
 ```shell
 pip install nautobot-chatops-arista-cloudvision
 ```
-
-## Usage
-
-### Nautobot Config
 
 You must first update the Nautobot configuration file with a new entry in the `PLUGINS_CONFIG` dictionary.
 
@@ -54,6 +51,7 @@ Once you have updated your environment file, restart both nautobot and nautobot-
 $ sudo systemctl daemon-reload
 $ sudo systemctl restart nautobot nautobot-worker
 ```
+## Usage
 
 ### Command setup
 
