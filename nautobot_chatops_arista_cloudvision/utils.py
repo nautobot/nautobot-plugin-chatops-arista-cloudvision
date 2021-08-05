@@ -13,15 +13,17 @@ directory = os.path.dirname(fullpath)
 
 PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_chatops_arista_cloudvision"]
 
-CVAAS_TOKEN = PLUGIN_SETTINGS.get("CVAAS_TOKEN")
+CVAAS_TOKEN = PLUGIN_SETTINGS.get("cvaas_token")
+if CVAAS_TOKEN:
+    with open("cvaas_token.txt", "w") as tf:
+        tf.write(PLUGIN_SETTINGS.get("cvaas_token"))
 CVAAS_ADDR = "apiserver.arista.io:443"
-CVAAS_TOKEN_PATH = f"{directory}/cvaas_token.txt"
 
-CVP_USERNAME = PLUGIN_SETTINGS.get("CVP_USERNAME")
-CVP_PASSWORD = PLUGIN_SETTINGS.get("CVP_PASSWORD")
-CVP_HOST = PLUGIN_SETTINGS.get("CVP_HOST")
-CVP_INSECURE = PLUGIN_SETTINGS.get("CVP_INSECURE")
-ON_PREM = PLUGIN_SETTINGS.get("ON_PREM")
+CVP_USERNAME = PLUGIN_SETTINGS.get("cvp_username")
+CVP_PASSWORD = PLUGIN_SETTINGS.get("cvp_password")
+CVP_HOST = PLUGIN_SETTINGS.get("cvp_host")
+CVP_INSECURE = PLUGIN_SETTINGS.get("cvp_insecure")
+ON_PREM = PLUGIN_SETTINGS.get("on_prem")
 CVP_TOKEN_PATH = f"{directory}/token.txt"
 CRT_FILE_PATH = f"{directory}/cvp.crt"
 
@@ -60,7 +62,7 @@ def prompt_for_image_bundle_name_or_all(action_id, help_text, dispatcher):
 
 def connect_cvp():
     """Connect to an instance of Cloudvision."""
-    if ON_PREM:
+    if ON_PREM.lower() == "true":
         clnt = CvpClient()
         clnt.connect([CVP_HOST], CVP_USERNAME, CVP_PASSWORD)
         token_request = requests.post(

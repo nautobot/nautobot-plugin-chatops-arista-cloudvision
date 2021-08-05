@@ -46,7 +46,7 @@ def cloudvision_logo(dispatcher):
 
 def check_credentials(dispatcher):
     """Check whether to use on prem or cloud instance of Cloudvision."""
-    if PLUGIN_SETTINGS.get("on_prem"):
+    if PLUGIN_SETTINGS.get("on_prem").lower() == "true":
         if (
             not PLUGIN_SETTINGS.get("cvp_username")
             and not PLUGIN_SETTINGS.get("cvp_password")
@@ -67,7 +67,6 @@ def check_credentials(dispatcher):
 def cloudvision_chatbot(subcommand, **kwargs):
     """Interact with cloudvision."""
     return handle_subcommands("cloudvision", subcommand, **kwargs)
-
 
 @subcommand_of("cloudvision")
 def get_devices_in_container(dispatcher, container_name=None):
