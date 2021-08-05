@@ -1,4 +1,4 @@
-"""Plugin declaration for nautobot_chatops_extension_arista."""
+"""Plugin declaration for nautobot_plugin_chatops_cloudvision."""
 
 __version__ = "0.1.0"
 
@@ -6,14 +6,14 @@ from nautobot.extras.plugins import PluginConfig
 
 
 class NautobotChatopsExtensionAristaConfig(PluginConfig):
-    """Plugin configuration for the nautobot_chatops_extension_arista plugin."""
+    """Plugin configuration for the nautobot_plugin_chatops_cloudvision plugin."""
 
-    name = "nautobot_chatops_extension_arista"
-    verbose_name = "Nautobot Chatops Extension Arista"
+    name = "nautobot_plugin_chatops_cloudvision"
+    verbose_name = "Nautobot Plugin Chatops Cloudvision"
     version = __version__
     author = "Network to Code, LLC"
-    description = "Nautobot Chatops Extension Arista."
-    base_url = "nautobot-chatops-extension-arista"
+    description = "Nautobot Plugin Chatops Cloudvision."
+    base_url = "nautobot_plugin_chatops_cloudvision"
     required_settings = []
     min_version = "1.0.0"
     max_version = "1.9999"
