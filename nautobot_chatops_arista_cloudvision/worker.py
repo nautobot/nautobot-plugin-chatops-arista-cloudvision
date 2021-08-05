@@ -6,7 +6,7 @@ from django_rq import job
 from django.conf import settings
 from nautobot_chatops.workers import subcommand_of, handle_subcommands  # pylint: disable=import-error
 from nautobot_chatops.choices import CommandStatusChoices  # pylint: disable=import-error
-import nautobot_plugin_chatops_cloudvision.cvpgrpcutils as grpcutils
+import nautobot_chatops_arista_cloudvision.cvpgrpcutils as grpcutils
 from .utils import (
     prompt_for_events_filter,
     prompt_for_device_or_container,
@@ -36,7 +36,7 @@ from .utils import (
 
 logger = logging.getLogger("rq.worker")
 dir_path = os.path.dirname(os.path.realpath(__file__))
-PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_plugin_chatops_cloudvision"]
+PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_chatops_arista_cloudvision"]
 
 
 def cloudvision_logo(dispatcher):

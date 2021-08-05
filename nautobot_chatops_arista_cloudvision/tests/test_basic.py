@@ -3,7 +3,7 @@ import unittest
 import os
 import toml
 
-from nautobot_plugin_chatops_cloudvision import __version__ as project_version
+from nautobot_chatops_arista_cloudvision import __version__ as project_version
 
 
 class TestVersion(unittest.TestCase):

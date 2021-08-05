@@ -11,7 +11,7 @@ from django.conf import settings
 fullpath = os.path.abspath(__file__)
 directory = os.path.dirname(fullpath)
 
-PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_plugin_chatops_cloudvision"]
+PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_chatops_arista_cloudvision"]
 
 CVAAS_TOKEN = PLUGIN_SETTINGS.get("CVAAS_TOKEN")
 CVAAS_ADDR = "apiserver.arista.io:443"

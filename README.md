@@ -42,7 +42,7 @@ PLUGINS_CONFIG = {
         'slack_api_token': os.getenv("SLACK_API_TOKEN"),
         'slack_signing_secret': os.getenv("SLACK_SIGNING_SECRET")
     },
-    'nautobot_plugin_chatops_cloudvision' : {
+    'nautobot_chatops_arista_cloudvision' : {
         'cvaas_token': os.getenv("CVAAS_TOKEN"),
         'cvp_username': os.getenv("CVP_USERNAME"),
         'cvp_password': os.getenv("CVP_PASSWORD"),
@@ -110,7 +110,7 @@ The development environment can be used in 2 ways. First, with a local poetry en
 The [PyInvoke](http://www.pyinvoke.org/) library is used to provide some helper commands based on the environment.  There are a few configuration parameters which can be passed to PyInvoke to override the default configuration:
 
 * `nautobot_ver`: the version of Nautobot to use as a base for any built docker containers (default: 1.0.1)
-* `project_name`: the default docker compose project name (default: nautobot_plugin_chatops_cloudvision)
+* `project_name`: the default docker compose project name (default: nautobot_chatops_arista_cloudvision)
 * `python_ver`: the version of Python to use as a base for any built docker containers (default: 3.6)
 * `local`: a boolean flag indicating if invoke tasks should be run on the host or inside the docker containers (default: False, commands will be run in docker containers)
 * `compose_dir`: the full path to a directory containing the project compose files
@@ -126,7 +126,7 @@ Using PyInvoke these configuration options can be overridden using [several meth
 
 ```shell
 ---
-nautobot_plugin_chatops_cloudvision:
+nautobot_chatops_arista_cloudvision:
   local: true
   compose_files:
     - "docker-compose.requirements.yml"
