@@ -13,7 +13,7 @@ include = [
     "README.md",
 ]
 packages = [
-    { include = "nautobot_plugin_chatops_cloudvision" },
+    { include = "nautobot_chatops_arista_cloudvision" },
 ]
 
 [tool.poetry.plugins."nautobot.workers"]
