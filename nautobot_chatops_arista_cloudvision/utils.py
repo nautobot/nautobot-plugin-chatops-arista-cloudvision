@@ -14,9 +14,6 @@ directory = os.path.dirname(fullpath)
 PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_chatops_arista_cloudvision"]
 
 CVAAS_TOKEN = PLUGIN_SETTINGS.get("cvaas_token")
-if CVAAS_TOKEN:
-    with open("cvaas_token.txt", "w") as tf:
-        tf.write(PLUGIN_SETTINGS.get("cvaas_token"))
 CVAAS_ADDR = "apiserver.arista.io:443"
 
 CVP_USERNAME = PLUGIN_SETTINGS.get("cvp_username")
@@ -233,11 +230,11 @@ def get_severity_events(filter_value):
 def get_active_events_data(apiserverAddr=None, token=None, certs=None, key=None, ca=None):
     # pylint: disable=invalid-name
     """Gets a list of active event types from CVP."""
-    if ON_PREM:
+    if check_on_prem():
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
-        token = CVAAS_TOKEN_PATH
+        token = CVAAS_TOKEN
 
     pathElts = [
         "events",
@@ -245,7 +242,7 @@ def get_active_events_data(apiserverAddr=None, token=None, certs=None, key=None,
     ]
     query = [create_query([(pathElts, [])], "analytics")]
     events = []
-    with GRPCClient(apiserverAddr, token=token, key=key, ca=ca, certs=certs) as client:
+    with GRPCClient(apiserverAddr, tokenValue=token, key=key, ca=ca, certs=certs) as client:
         for batch in client.get(query):
             for notif in batch["notifications"]:
                 for info in notif["updates"].values():
@@ -263,11 +260,11 @@ def get_active_events_data_filter(
 ):
     # pylint: disable=invalid-name,too-many-arguments,too-many-locals,too-many-branches,no-member
     """Gets a list of active event types from CVP in a specific time range."""
-    if ON_PREM:
+    if check_on_prem():
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
-        token = CVAAS_TOKEN_PATH
+        token = CVAAS_TOKEN
 
     start = Timestamp()
     if isinstance(start_time, str):
@@ -286,7 +283,7 @@ def get_active_events_data_filter(
     ]
     query = [create_query([(pathElts, [])], "analytics")]
     events = []
-    with GRPCClient(apiserverAddr, token=token, key=key, ca=ca, certs=certs) as client:
+    with GRPCClient(apiserverAddr, tokenValue=token, key=key, ca=ca, certs=certs) as client:
         for batch in client.get(query, start=start, end=end):
             for notif in batch["notifications"]:
                 for info in notif["updates"].values():
@@ -311,11 +308,11 @@ def get_active_events_data_filter(
 def get_active_severity_types(apiserverAddr=None, token=None, certs=None, key=None, ca=None):
     """Gets a list of active event types from CVP."""
     # pylint: disable=invalid-name
-    if ON_PREM:
+    if check_on_prem():
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
-        token = CVAAS_TOKEN_PATH
+        token = CVAAS_TOKEN
 
     pathElts = [
         "events",
@@ -323,7 +320,7 @@ def get_active_severity_types(apiserverAddr=None, token=None, certs=None, key=No
     ]
     query = [create_query([(pathElts, [])], "analytics")]
     event_types = []
-    with GRPCClient(apiserverAddr, token=token, key=key, ca=ca, certs=certs) as client:
+    with GRPCClient(apiserverAddr, tokenValue=token, key=key, ca=ca, certs=certs) as client:
         for batch in client.get(query):
             for notif in batch["notifications"]:
                 for info in notif["updates"]:
@@ -339,43 +336,19 @@ def get_applied_tags(device_id):
     result = clnt.post(tag_url, data=payload)
     return result
 
-
-def get_image_bundles():
-    """Get image bundle from cloudvision."""
-    clnt = connect_cvp()
-    result = clnt.api.get_image_bundles()
-    return result["data"]
-
-
-def get_images(image_bundle_name=None):
-    """Get images that are on Cloudvision."""
-    clnt = connect_cvp()
-    if not image_bundle_name:
-        result = clnt.api.get_images()
-        return result["data"]
-    combined_applied = {}
-    url_containers = f"/image/getImageBundleAppliedContainers.do?imageName={image_bundle_name}&startIndex=0&endIndex=0"
-    url_devices = f"/image/getImageBundleAppliedDevices.do?imageName={image_bundle_name}&startIndex=0&endIndex=0"
-    result_containers = clnt.get(url_containers)
-    result_devices = clnt.get(url_devices)
-    combined_applied["containers"] = result_containers["data"]
-    combined_applied["devices"] = result_devices["data"]
-    return combined_applied
-
-
 def get_device_bugs_data(device_id, apiserverAddr=None, token=None, certs=None, key=None, ca=None):
     """Get bugs associated with a device."""
     # pylint: disable=invalid-name,too-many-arguments
-    if ON_PREM:
+    if check_on_prem():
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
-        token = CVAAS_TOKEN_PATH
+        token = CVAAS_TOKEN
 
     pathElts = ["tags", "BugAlerts", "devices"]
     query = [create_query([(pathElts, [])], "analytics")]
     bugs = []
-    with GRPCClient(apiserverAddr, token=token, key=key, ca=ca, certs=certs) as client:
+    with GRPCClient(apiserverAddr, tokenValue=token, key=key, ca=ca, certs=certs) as client:
         for batch in client.get(query):
             for notif in batch["notifications"]:
                 if notif["updates"].get(device_id):
@@ -386,11 +359,12 @@ def get_device_bugs_data(device_id, apiserverAddr=None, token=None, certs=None, 
 def get_bug_info(bug_id, apiserverAddr=None, token=None):
     """Get detailed information about a bug given its identifier."""
     # pylint: disable=invalid-name
-    if ON_PREM:
+    if check_on_prem():
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
-        token = CVAAS_TOKEN_PATH
+        token = CVAAS_TOKEN
+
     pathElts = [
         "BugAlerts",
         "bugs",
@@ -398,7 +372,7 @@ def get_bug_info(bug_id, apiserverAddr=None, token=None):
     ]
     query = [create_query([(pathElts, [])], "analytics")]
     bug_info = {}
-    with GRPCClient(apiserverAddr, token=token) as client:
+    with GRPCClient(apiserverAddr, tokenValue=token) as client:
         for batch in client.get(query):
             for notif in batch["notifications"]:
                 bug_info["identifier"] = bug_id
@@ -411,17 +385,22 @@ def get_bug_info(bug_id, apiserverAddr=None, token=None):
 def get_bug_device_report(apiserverAddr=None, token=None):
     """Get how many bugs each device has."""
     # pylint: disable=invalid-name
-    if ON_PREM:
+    if check_on_prem():
         apiserverAddr = CVP_HOST
     else:
         apiserverAddr = CVAAS_ADDR
-        token = CVAAS_TOKEN_PATH
+        token = CVAAS_TOKEN
 
     pathElts = ["BugAlerts", "DevicesBugsCount"]
     query = [create_query([(pathElts, [])], "analytics")]
     bug_count = {}
-    with GRPCClient(apiserverAddr, token=token) as client:
+    with GRPCClient(apiserverAddr, tokenValue=token) as client:
         for batch in client.get(query):
             for notif in batch["notifications"]:
                 bug_count = notif["updates"]
     return bug_count
+
+def check_on_prem():
+    if ON_PREM.lower() == "false":
+        return False
+    return True
