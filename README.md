@@ -25,7 +25,8 @@ PLUGINS_CONFIG = {
         'cvp_username': os.getenv("CVP_USERNAME"),
         'cvp_password': os.getenv("CVP_PASSWORD"),
         'cvp_host': os.getenv("CVP_HOST"),
-        "cvp_insecure": os.getenv("CVP_INSECURE"),
+        'cvp_token': os.getenv("CVP_TOKEN")
+        'cvp_insecure': os.getenv("CVP_INSECURE"),
         'on_prem': os.getenv("ON_PREM")
     }
 }
@@ -42,6 +43,7 @@ For on premise instance of CloudVision, these environment variables must be set.
 - `CVP_USERNAME`: The username that will be used to authenticate to CloudVision.
 - `CVP_PASSWORD`: The password for the configured username.
 - `CVP_HOST`: The IP or hostname of the on premise CloudVision appliance.
+- `CVP_TOKEN`: Token generated from the on=prem instance service account.
 - `CVP_INSECURE`: If this is set to `True`, the appliance cert will be downloaded and automatically trusted. Otherwise, the appliance is expected to have a valid certificate.
 - `ON_PREM`: By default this is set to False, this must be changed to `True` if using an on-prem instance of CloudVision.
 

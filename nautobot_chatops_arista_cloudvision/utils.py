@@ -21,6 +21,7 @@ CVP_PASSWORD = PLUGIN_SETTINGS.get("cvp_password")
 CVP_HOST = PLUGIN_SETTINGS.get("cvp_host")
 CVP_INSECURE = PLUGIN_SETTINGS.get("cvp_insecure")
 ON_PREM = PLUGIN_SETTINGS.get("on_prem")
+CVP_TOKEN = PLUGIN_SETTINGS.get("cvp_token")
 CVP_TOKEN_PATH = f"{directory}/token.txt"
 CRT_FILE_PATH = f"{directory}/cvp.crt"
 
@@ -232,6 +233,7 @@ def get_active_events_data(apiserverAddr=None, token=None, certs=None, key=None,
     """Gets a list of active event types from CVP."""
     if check_on_prem():
         apiserverAddr = CVP_HOST
+        token = CVP_TOKEN
     else:
         apiserverAddr = CVAAS_ADDR
         token = CVAAS_TOKEN
@@ -262,6 +264,7 @@ def get_active_events_data_filter(
     """Gets a list of active event types from CVP in a specific time range."""
     if check_on_prem():
         apiserverAddr = CVP_HOST
+        token = CVP_TOKEN
     else:
         apiserverAddr = CVAAS_ADDR
         token = CVAAS_TOKEN
@@ -310,6 +313,7 @@ def get_active_severity_types(apiserverAddr=None, token=None, certs=None, key=No
     # pylint: disable=invalid-name
     if check_on_prem():
         apiserverAddr = CVP_HOST
+        token = CVP_TOKEN
     else:
         apiserverAddr = CVAAS_ADDR
         token = CVAAS_TOKEN
@@ -341,6 +345,7 @@ def get_device_bugs_data(device_id, apiserverAddr=None, token=None, certs=None, 
     # pylint: disable=invalid-name,too-many-arguments
     if check_on_prem():
         apiserverAddr = CVP_HOST
+        token = CVP_TOKEN
     else:
         apiserverAddr = CVAAS_ADDR
         token = CVAAS_TOKEN
@@ -361,6 +366,7 @@ def get_bug_info(bug_id, apiserverAddr=None, token=None):
     # pylint: disable=invalid-name
     if check_on_prem():
         apiserverAddr = CVP_HOST
+        token = CVP_TOKEN
     else:
         apiserverAddr = CVAAS_ADDR
         token = CVAAS_TOKEN
@@ -387,6 +393,7 @@ def get_bug_device_report(apiserverAddr=None, token=None):
     # pylint: disable=invalid-name
     if check_on_prem():
         apiserverAddr = CVP_HOST
+        token = CVP_TOKEN
     else:
         apiserverAddr = CVAAS_ADDR
         token = CVAAS_TOKEN

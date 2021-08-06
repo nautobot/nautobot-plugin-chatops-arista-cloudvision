@@ -69,11 +69,6 @@ def cloudvision_chatbot(subcommand, **kwargs):
     return handle_subcommands("cloudvision", subcommand, **kwargs)
 
 @subcommand_of("cloudvision")
-def test(dispatcher):
-    """Test print"""
-    dispatcher.send_markdown(PLUGIN_SETTINGS.get("cvp_host"))
-
-@subcommand_of("cloudvision")
 def get_devices_in_container(dispatcher, container_name=None):
     """Get a list of devices in a Cloudvision container."""
     if not check_credentials(dispatcher):
