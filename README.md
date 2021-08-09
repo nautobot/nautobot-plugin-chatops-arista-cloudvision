@@ -1,9 +1,16 @@
-# Nautobot ChatOps Extension Arista
+# Arista CloudVision ChatOps
 
-An plugin for [Nautobot](https://github.com/nautobot/nautobot) [ChatOps Plugin](https://github.com/nautobot/nautobot-plugin-chatops/)
+Using the [Nautobot ChatOps](https://github.com/nautobot/nautobot-plugin-chatops/) base framework, this app adds the ability to gather tag data, device configuration, devices in a specific container, task logs, configlets, device's common vulnerabilities and exposures, and device events from Arista's CloudVision using Slack, Webex Team, MS Teams, and Mattermost.
 
+## Screenshots
 
-## Instalation
+![cloudvision_get_active_events](https://user-images.githubusercontent.com/38091261/128059429-4e4dc269-2113-411b-9721-9ef281a361c5.PNG)
+
+![cloudvision_get_configlet](https://user-images.githubusercontent.com/38091261/128059458-d6395d63-6909-4219-9dcb-dff1801cbda2.PNG)
+
+![cloudvision_get_device_cve](https://user-images.githubusercontent.com/38091261/128059481-2ff60896-81e4-46ae-992b-7d179403fe8f.PNG)
+
+## Installation
 
 The extension is available as a Python package in PyPI and can be installed with pip
 
@@ -25,7 +32,6 @@ PLUGINS_CONFIG = {
         'cvp_username': os.getenv("CVP_USERNAME"),
         'cvp_password': os.getenv("CVP_PASSWORD"),
         'cvp_host': os.getenv("CVP_HOST"),
-        'cvp_token': os.getenv("CVP_TOKEN")
         'cvp_insecure': os.getenv("CVP_INSECURE"),
         'on_prem': os.getenv("ON_PREM")
     }
@@ -43,7 +49,6 @@ For on premise instance of CloudVision, these environment variables must be set.
 - `CVP_USERNAME`: The username that will be used to authenticate to CloudVision.
 - `CVP_PASSWORD`: The password for the configured username.
 - `CVP_HOST`: The IP or hostname of the on premise CloudVision appliance.
-- `CVP_TOKEN`: Token generated from the on=prem instance service account.
 - `CVP_INSECURE`: If this is set to `True`, the appliance cert will be downloaded and automatically trusted. Otherwise, the appliance is expected to have a valid certificate.
 - `ON_PREM`: By default this is set to False, this must be changed to `True` if using an on-prem instance of CloudVision.
 
@@ -70,12 +75,6 @@ The following commands are available:
 - `get-active-events [filter-type] [filter-value] [start-time] [end-time]`: Get active events in a given time frame. Filter-type can be filtered by device, type or severity. Filter-value is dynamically created based on the filter-type. Start-time accepts ISO time format as well as relative time inputs. Examples of that are  `-2w`, `-2d`, `-2h` which will go back two weeks, two days and two hours, respectively.
 - `get-tags [device-name]`: Get system or user tags assigned to a device.
 - `get-device-cve [device-name]`: Gets all the CVEs of the specified device. Can also specifiy the `all` parameter to get a count of CVE account for each device.
-
-## Screenshots
-
-![cloudvision_get_active_events](https://user-images.githubusercontent.com/38091261/128059429-4e4dc269-2113-411b-9721-9ef281a361c5.PNG)
-![cloudvision_get_configlet](https://user-images.githubusercontent.com/38091261/128059458-d6395d63-6909-4219-9dcb-dff1801cbda2.PNG)
-![cloudvision_get_device_cve](https://user-images.githubusercontent.com/38091261/128059481-2ff60896-81e4-46ae-992b-7d179403fe8f.PNG)
 
 ## Contributing
 

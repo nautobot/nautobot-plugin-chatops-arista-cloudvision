@@ -58,7 +58,9 @@ def check_credentials(dispatcher):
             return False
     else:
         if not PLUGIN_SETTINGS.get("cvaas_token"):
-            dispatcher.send_warning("Please ensure environment variable CVAAS_TOKEN is set and your nautobot config file is updated.")
+            dispatcher.send_warning(
+                "Please ensure environment variable CVAAS_TOKEN is set and your nautobot config file is updated."
+            )
             return False
     return True
 
@@ -67,6 +69,7 @@ def check_credentials(dispatcher):
 def cloudvision_chatbot(subcommand, **kwargs):
     """Interact with cloudvision."""
     return handle_subcommands("cloudvision", subcommand, **kwargs)
+
 
 @subcommand_of("cloudvision")
 def get_devices_in_container(dispatcher, container_name=None):
@@ -82,7 +85,8 @@ def get_devices_in_container(dispatcher, container_name=None):
         return False
 
     dispatcher.send_markdown(
-        f"Standby {dispatcher.user_mention()}, I'm getting the devices from the container {container_name}.", ephemeral=True
+        f"Standby {dispatcher.user_mention()}, I'm getting the devices from the container {container_name}.",
+        ephemeral=True,
     )
 
     devices = get_cloudvision_container_devices(container_name)
@@ -120,7 +124,8 @@ def get_configlet(dispatcher, configlet_name=None):
         return False
 
     dispatcher.send_markdown(
-        f"Standby {dispatcher.user_mention()}, I'm getting the configuration of the {configlet_name} configlet.", ephemeral=True
+        f"Standby {dispatcher.user_mention()}, I'm getting the configuration of the {configlet_name} configlet.",
+        ephemeral=True,
     )
 
     config = get_configlet_config(configlet_name)
@@ -147,7 +152,8 @@ def get_device_configuration(dispatcher, device_name=None):
         return False
 
     dispatcher.send_markdown(
-        f"Stand by {dispatcher.user_mention()}, I'm getting the running configuration for {device_name}.", ephemeral=True
+        f"Stand by {dispatcher.user_mention()}, I'm getting the running configuration for {device_name}.",
+        ephemeral=True,
     )
 
     device = next(device for device in device_list if device["hostname"] == device_name)
@@ -176,7 +182,9 @@ def get_task_logs(dispatcher, task_id=None):
 
         return False
 
-    dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting the logs of task {task_id}.", ephemeral=True)
+    dispatcher.send_markdown(
+        f"Stand by {dispatcher.user_mention()}, I'm getting the logs of task {task_id}.", ephemeral=True
+    )
 
     single_task = next(task for task in task_list if task["workOrderId"] == task_id)
     single_task_cc_id = single_task.get("ccIdV2")
@@ -244,7 +252,8 @@ def get_applied_configlets(dispatcher, filter_type=None, filter_value=None):
         applied_configlets = get_applied_configlets_device_id(filter_value, device_list)
 
     dispatcher.send_markdown(
-        f"Stand by {dispatcher.user_mention()}, I'm getting the configs applied to the {filter_type} {filter_value}.", ephemeral=True
+        f"Stand by {dispatcher.user_mention()}, I'm getting the configs applied to the {filter_type} {filter_value}.",
+        ephemeral=True,
     )
     dispatcher.send_blocks(
         dispatcher.command_response_header(
@@ -353,21 +362,24 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
             filter_type=filter_type, filter_value=filter_value, start_time=start_time, end_time=end_time
         )
         dispatcher.send_markdown(
-            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with severity level {filter_value}.", ephemeral=True
+            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with severity level {filter_value}.",
+            ephemeral=True,
         )
     elif filter_type == "device":
         active_events = get_active_events_data_filter(
             filter_type=filter_type, filter_value=filter_value, start_time=start_time, end_time=end_time
         )
         dispatcher.send_markdown(
-            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with for device {filter_value}.", ephemeral=True
+            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with for device {filter_value}.",
+            ephemeral=True,
         )
     elif filter_type == "type":
         active_events = get_active_events_data_filter(
             filter_type=filter_type, filter_value=filter_value, start_time=start_time, end_time=end_time
         )
         dispatcher.send_markdown(
-            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with for event type {filter_value}.", ephemeral=True
+            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with for event type {filter_value}.",
+            ephemeral=True,
         )
 
     dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting those events.", ephemeral=True)
@@ -408,14 +420,19 @@ def get_tags(dispatcher, device_name=None):
         dispatcher.prompt_from_menu("cloudvision get-tags", "Select a device.", choices)
         return False
 
-    dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting the tags for {device_name}.", ephemeral=True)
+    dispatcher.send_markdown(
+        f"Stand by {dispatcher.user_mention()}, I'm getting the tags for {device_name}.", ephemeral=True
+    )
 
     device_id = get_device_id_from_hostname(device_name)
     tags = grpcutils.get_device_tags(device_id, PLUGIN_SETTINGS)
 
     dispatcher.send_blocks(
         dispatcher.command_response_header(
-            "cloudvision", "get-tags", [("Device Name", device_name)], "information",
+            "cloudvision",
+            "get-tags",
+            [("Device Name", device_name)],
+            "information",
         )
     )
 
@@ -445,7 +462,9 @@ def get_device_cve(dispatcher, device_name=None):
     if device_name == "all":
         bug_count = get_bug_device_report()
 
-        dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting that CVE report for you.", ephemeral=True)
+        dispatcher.send_markdown(
+            f"Stand by {dispatcher.user_mention()}, I'm getting that CVE report for you.", ephemeral=True
+        )
 
         dispatcher.send_blocks(
             dispatcher.command_response_header(
