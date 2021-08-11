@@ -13,11 +13,11 @@ include = [
     "README.md",
 ]
 packages = [
-    { include = "nautobot_plugin_chatops_cloudvision" },
+    { include = "nautobot_chatops_arista_cloudvision" },
 ]
 
 [tool.poetry.plugins."nautobot.workers"]
-"cloudvision" = "nautobot_plugin_chatops_cloudvision.worker:cloudvision_chatbot"
+"cloudvision" = "nautobot_chatops_arista_cloudvision.worker:cloudvision_chatbot"
 
 [tool.poetry.dependencies]
 # Used for local development

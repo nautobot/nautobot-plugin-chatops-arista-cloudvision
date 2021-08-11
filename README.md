@@ -1,37 +1,22 @@
-# Nautobot Chatops Extension Arista
+# Arista CloudVision ChatOps
 
-An extension for [Nautobot](https://github.com/nautobot/nautobot) [Chatops Plugin](https://github.com/nautobot/nautobot-plugin-chatops/)
+Using the [Nautobot ChatOps](https://github.com/nautobot/nautobot-plugin-chatops/) base framework, this app adds the ability to gather tag data, device configuration, devices in a specific container, task logs, configlets, device's common vulnerabilities and exposures, and device events from Arista's CloudVision using Slack, Webex Team, MS Teams, and Mattermost.
+
+## Screenshots
+
+![cloudvision_get_active_events](https://user-images.githubusercontent.com/38091261/128059429-4e4dc269-2113-411b-9721-9ef281a361c5.PNG)
+
+![cloudvision_get_configlet](https://user-images.githubusercontent.com/38091261/128059458-d6395d63-6909-4219-9dcb-dff1801cbda2.PNG)
+
+![cloudvision_get_device_cve](https://user-images.githubusercontent.com/38091261/128059481-2ff60896-81e4-46ae-992b-7d179403fe8f.PNG)
+
+## Installation
 
 The extension is available as a Python package in PyPI and can be installed with pip
 
 ```shell
-pip install git+https://github.com/nautobot/nautobot-plugin-chatops-arista-cloudvision.git
+pip install nautobot-chatops-arista-cloudvision
 ```
-
-This ChatOps Extension to Nautobot ChatOps Plugin requires environment variables to be set up depending on if you are using a CVAAS (Cloudvision as a Service) or Cloudvision on-premise.
-
-For CVAAS the following environment variables must be set.
-
-- `CVAAS_TOKEN`: Token generated from CVAAS service account. Documentation for that process can be found [here](https://www.arista.com/assets/data/pdf/qsg/qsg-books/QS_CloudVision_as_a_Service.pdf) in section 1.7
-
-For on premise instance of Cloudvision, these environment variables must be set.
-
-- `CVP_USERNAME`: The username that will be used to authenticate to Cloudvision.
-- `CVP_PASSWORD`: The password for the configured username.
-- `CVP_HOST`: The IP or hostname of the on premise Cloudvision appliance.
-- `CVP_INSECURE`: If this is set to `True`, the appliance cert will be downloaded and automatically trusted. Otherwise, the appliance is expected to have a valid certificate.
-- `ON_PREM`: By default this is set to False, this must be changed to `True` if using an on-prem instance of Cloudvision.
-
-Once you have updated your environment file, restart both nautobot and nautobot-worker
-
-```
-$ sudo systemctl daemon-reload
-$ sudo systemctl restart nautobot nautobot-worker
-```
-
-## Usage
-
-### Nautobot Config
 
 You must first update the Nautobot configuration file with a new entry in the `PLUGINS_CONFIG` dictionary.
 
@@ -42,30 +27,30 @@ PLUGINS_CONFIG = {
         'slack_api_token': os.getenv("SLACK_API_TOKEN"),
         'slack_signing_secret': os.getenv("SLACK_SIGNING_SECRET")
     },
-    'nautobot_plugin_chatops_cloudvision' : {
+    'nautobot_chatops_arista_cloudvision' : {
         'cvaas_token': os.getenv("CVAAS_TOKEN"),
         'cvp_username': os.getenv("CVP_USERNAME"),
         'cvp_password': os.getenv("CVP_PASSWORD"),
         'cvp_host': os.getenv("CVP_HOST"),
-        "cvp_insecure": os.getenv("CVP_INSECURE"),
+        'cvp_insecure': os.getenv("CVP_INSECURE"),
         'on_prem': os.getenv("ON_PREM")
     }
 }
 ```
 
-After that, you must update environment variables depending on if you are using a CVAAS (Cloudvision as a Service) or Cloudvision on-premise. To update environment variables in Nautobot check out our blog post [here](http://blog.networktocode.com/post/creating-custom-chat-commands-using-nautobot-chatops/)
+After that, you must update environment variables depending on if you are using a CVaaS (CloudVision as a Service) or CloudVision on-premise. To update environment variables in Nautobot check out our blog post [here](http://blog.networktocode.com/post/creating-custom-chat-commands-using-nautobot-chatops/)
 
 For CVAAS the following environment variables must be set.
 
 - `CVAAS_TOKEN`: Token generated from CVAAS service account. Documentation for that process can be found [here](https://www.arista.com/assets/data/pdf/qsg/qsg-books/QS_CloudVision_as_a_Service.pdf) in section 1.7
 
-For on premise instance of Cloudvision, these environment variables must be set.
+For on premise instance of CloudVision, these environment variables must be set.
 
-- `CVP_USERNAME`: The username that will be used to authenticate to Cloudvision.
+- `CVP_USERNAME`: The username that will be used to authenticate to CloudVision.
 - `CVP_PASSWORD`: The password for the configured username.
-- `CVP_HOST`: The IP or hostname of the on premise Cloudvision appliance.
+- `CVP_HOST`: The IP or hostname of the on premise CloudVision appliance.
 - `CVP_INSECURE`: If this is set to `True`, the appliance cert will be downloaded and automatically trusted. Otherwise, the appliance is expected to have a valid certificate.
-- `ON_PREM`: By default this is set to False, this must be changed to `True` if using an on-prem instance of Cloudvision.
+- `ON_PREM`: By default this is set to False, this must be changed to `True` if using an on-prem instance of CloudVision.
 
 Once you have updated your environment file, restart both nautobot and nautobot-worker
 
@@ -73,6 +58,7 @@ Once you have updated your environment file, restart both nautobot and nautobot-
 $ sudo systemctl daemon-reload
 $ sudo systemctl restart nautobot nautobot-worker
 ```
+## Usage
 
 ### Command setup
 
@@ -87,7 +73,7 @@ The following commands are available:
 - `get-task-logs [task-id]`: Get the logs of the specified task.
 - `get-applied-configlets [filter-type] [filter-value]`: Get applied configlets to either a specified container or device.
 - `get-active-events [filter-type] [filter-value] [start-time] [end-time]`: Get active events in a given time frame. Filter-type can be filtered by device, type or severity. Filter-value is dynamically created based on the filter-type. Start-time accepts ISO time format as well as relative time inputs. Examples of that are  `-2w`, `-2d`, `-2h` which will go back two weeks, two days and two hours, respectively.
-- `get-applied-image-bundles [filter-type] [image-bundle-name]`: Gets the devices and containers an image bundle is applied to. Can also specify the `all` parameter to get a list of all the image bundles on Cloudvision.
+- `get-tags [device-name]`: Get system or user tags assigned to a device.
 - `get-device-cve [device-name]`: Gets all the CVEs of the specified device. Can also specifiy the `all` parameter to get a count of CVE account for each device.
 
 ## Contributing
@@ -103,6 +89,8 @@ The project is following Network to Code software development guideline and is l
 
 ### Development Environment
 
+> A slack workspace is needed to test in a development environment.
+
 The development environment can be used in 2 ways. First, with a local poetry environment if you wish to develop outside of Docker. Second, inside of a docker container.
 
 #### Invoke tasks
@@ -110,7 +98,7 @@ The development environment can be used in 2 ways. First, with a local poetry en
 The [PyInvoke](http://www.pyinvoke.org/) library is used to provide some helper commands based on the environment.  There are a few configuration parameters which can be passed to PyInvoke to override the default configuration:
 
 * `nautobot_ver`: the version of Nautobot to use as a base for any built docker containers (default: 1.0.1)
-* `project_name`: the default docker compose project name (default: nautobot_plugin_chatops_cloudvision)
+* `project_name`: the default docker compose project name (default: nautobot_chatops_arista_cloudvision)
 * `python_ver`: the version of Python to use as a base for any built docker containers (default: 3.6)
 * `local`: a boolean flag indicating if invoke tasks should be run on the host or inside the docker containers (default: False, commands will be run in docker containers)
 * `compose_dir`: the full path to a directory containing the project compose files
@@ -126,7 +114,7 @@ Using PyInvoke these configuration options can be overridden using [several meth
 
 ```shell
 ---
-nautobot_plugin_chatops_cloudvision:
+nautobot_chatops_arista_cloudvision:
   local: true
   compose_files:
     - "docker-compose.requirements.yml"
@@ -207,14 +195,6 @@ Each command can be executed with `invoke <command>`. Environment variables `INV
   tests            Run all tests for this plugin.
   unittest         Run Django unit tests for the plugin.
 ```
-
-## Screenshots
-
-![cloudvision_get_active_events](https://user-images.githubusercontent.com/38091261/128059429-4e4dc269-2113-411b-9721-9ef281a361c5.PNG)
-![cloudvision_get_configlet](https://user-images.githubusercontent.com/38091261/128059458-d6395d63-6909-4219-9dcb-dff1801cbda2.PNG)
-![cloudvision_get_device_cve](https://user-images.githubusercontent.com/38091261/128059481-2ff60896-81e4-46ae-992b-7d179403fe8f.PNG)
-
-
 
 ## Questions
 

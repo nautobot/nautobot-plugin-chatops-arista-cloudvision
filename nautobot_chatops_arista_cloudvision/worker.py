@@ -6,7 +6,7 @@ from django_rq import job
 from django.conf import settings
 from nautobot_chatops.workers import subcommand_of, handle_subcommands  # pylint: disable=import-error
 from nautobot_chatops.choices import CommandStatusChoices  # pylint: disable=import-error
-import nautobot_plugin_chatops_cloudvision.cvpgrpcutils as grpcutils
+import nautobot_chatops_arista_cloudvision.cvpgrpcutils as grpcutils
 from .utils import (
     prompt_for_events_filter,
     prompt_for_device_or_container,
@@ -36,7 +36,7 @@ from .utils import (
 
 logger = logging.getLogger("rq.worker")
 dir_path = os.path.dirname(os.path.realpath(__file__))
-PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_plugin_chatops_cloudvision"]
+PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_chatops_arista_cloudvision"]
 
 
 def cloudvision_logo(dispatcher):
@@ -46,19 +46,21 @@ def cloudvision_logo(dispatcher):
 
 def check_credentials(dispatcher):
     """Check whether to use on prem or cloud instance of Cloudvision."""
-    if PLUGIN_SETTINGS.get("on_prem"):
+    if PLUGIN_SETTINGS.get("on_prem").lower() == "true":
         if (
             not PLUGIN_SETTINGS.get("cvp_username")
             and not PLUGIN_SETTINGS.get("cvp_password")
-            and not PLUGIN_SETTINGS.get("cvp_url")
+            and not PLUGIN_SETTINGS.get("cvp_host")
         ):
             dispatcher.send_warning(
-                "Please ensure environment variables CVP_USERNAME, CVP_PASSWORD and CVP_URL are set."
+                "Please ensure environment variables CVP_USERNAME, CVP_PASSWORD and CVP_URL are set and your nautobot config file is updated."
             )
             return False
     else:
         if not PLUGIN_SETTINGS.get("cvaas_token"):
-            dispatcher.send_warning("Please ensure environment variable CVAAS_TOKEN is set.")
+            dispatcher.send_warning(
+                "Please ensure environment variable CVAAS_TOKEN is set and your nautobot config file is updated."
+            )
             return False
     return True
 
@@ -83,7 +85,8 @@ def get_devices_in_container(dispatcher, container_name=None):
         return False
 
     dispatcher.send_markdown(
-        f"Standby {dispatcher.user_mention()}, I'm getting the devices from the container {container_name}."
+        f"Standby {dispatcher.user_mention()}, I'm getting the devices from the container {container_name}.",
+        ephemeral=True,
     )
 
     devices = get_cloudvision_container_devices(container_name)
@@ -121,7 +124,8 @@ def get_configlet(dispatcher, configlet_name=None):
         return False
 
     dispatcher.send_markdown(
-        f"Standby {dispatcher.user_mention()}, I'm getting the configuration of the {configlet_name} configlet."
+        f"Standby {dispatcher.user_mention()}, I'm getting the configuration of the {configlet_name} configlet.",
+        ephemeral=True,
     )
 
     config = get_configlet_config(configlet_name)
@@ -148,7 +152,8 @@ def get_device_configuration(dispatcher, device_name=None):
         return False
 
     dispatcher.send_markdown(
-        f"Stand by {dispatcher.user_mention()}, I'm getting the running configuration for {device_name}."
+        f"Stand by {dispatcher.user_mention()}, I'm getting the running configuration for {device_name}.",
+        ephemeral=True,
     )
 
     device = next(device for device in device_list if device["hostname"] == device_name)
@@ -177,7 +182,9 @@ def get_task_logs(dispatcher, task_id=None):
 
         return False
 
-    dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting the logs of task {task_id}.")
+    dispatcher.send_markdown(
+        f"Stand by {dispatcher.user_mention()}, I'm getting the logs of task {task_id}.", ephemeral=True
+    )
 
     single_task = next(task for task in task_list if task["workOrderId"] == task_id)
     single_task_cc_id = single_task.get("ccIdV2")
@@ -245,7 +252,8 @@ def get_applied_configlets(dispatcher, filter_type=None, filter_value=None):
         applied_configlets = get_applied_configlets_device_id(filter_value, device_list)
 
     dispatcher.send_markdown(
-        f"Stand by {dispatcher.user_mention()}, I'm getting the configs applied to the {filter_type} {filter_value}."
+        f"Stand by {dispatcher.user_mention()}, I'm getting the configs applied to the {filter_type} {filter_value}.",
+        ephemeral=True,
     )
     dispatcher.send_blocks(
         dispatcher.command_response_header(
@@ -322,7 +330,7 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
     if not start_time:
         dispatcher.prompt_for_text(
             f"cloudvision get-active-events {filter_type} {filter_value}",
-            "Enter start time in ISO format.",
+            "Enter start time in ISO format or enter a relative time using 'h' for hours, 'd' for days, and 'w' for weeks. Ex: '-2d'",
             "Start Time",
         )
         return False
@@ -330,7 +338,7 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
     if not end_time:
         dispatcher.prompt_for_text(
             f"cloudvision get-active-events {filter_type} {filter_value} {start_time}",
-            "Enter end time in ISO format.",
+            "Enter start time in ISO format or enter a relative time using 'h' for hours, 'd' for days, and 'w' for weeks. Ex: '-2d'. You may also type 'now' to use the current time.",
             "End Time",
         )
         return False
@@ -354,24 +362,27 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
             filter_type=filter_type, filter_value=filter_value, start_time=start_time, end_time=end_time
         )
         dispatcher.send_markdown(
-            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with severity level {filter_value}."
+            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with severity level {filter_value}.",
+            ephemeral=True,
         )
     elif filter_type == "device":
         active_events = get_active_events_data_filter(
             filter_type=filter_type, filter_value=filter_value, start_time=start_time, end_time=end_time
         )
         dispatcher.send_markdown(
-            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with for device {filter_value}."
+            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with for device {filter_value}.",
+            ephemeral=True,
         )
     elif filter_type == "type":
         active_events = get_active_events_data_filter(
             filter_type=filter_type, filter_value=filter_value, start_time=start_time, end_time=end_time
         )
         dispatcher.send_markdown(
-            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with for event type {filter_value}."
+            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with for event type {filter_value}.",
+            ephemeral=True,
         )
 
-    dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting those events.")
+    dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting those events.", ephemeral=True)
 
     header = ["Title", "Severity", "Description", "Device"]
     rows = [(event["title"], event["severity"], event["description"], event["deviceId"]) for event in active_events]
@@ -409,14 +420,19 @@ def get_tags(dispatcher, device_name=None):
         dispatcher.prompt_from_menu("cloudvision get-tags", "Select a device.", choices)
         return False
 
-    dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting the tags for {device_name}.")
+    dispatcher.send_markdown(
+        f"Stand by {dispatcher.user_mention()}, I'm getting the tags for {device_name}.", ephemeral=True
+    )
 
     device_id = get_device_id_from_hostname(device_name)
     tags = grpcutils.get_device_tags(device_id, PLUGIN_SETTINGS)
 
     dispatcher.send_blocks(
         dispatcher.command_response_header(
-            "cloudvision", "get-tags", [("Device Name", device_name)], "information", cloudvision_logo(dispatcher)
+            "cloudvision",
+            "get-tags",
+            [("Device Name", device_name)],
+            "information",
         )
     )
 
@@ -446,7 +462,9 @@ def get_device_cve(dispatcher, device_name=None):
     if device_name == "all":
         bug_count = get_bug_device_report()
 
-        dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting that CVE report for you.")
+        dispatcher.send_markdown(
+            f"Stand by {dispatcher.user_mention()}, I'm getting that CVE report for you.", ephemeral=True
+        )
 
         dispatcher.send_blocks(
             dispatcher.command_response_header(
