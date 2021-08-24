@@ -243,17 +243,38 @@ NAPALM_ARGS = {}
 # Determine how many objects to display per page within a list. (Default: 50)
 PAGINATE_COUNT = int(os.environ.get("PAGINATE_COUNT", 50))
 
-# Enable installed plugins. Add the name of each plugin to the list.
-PLUGINS = ["nautobot_chatops_arista_cloudvision"]
+PLUGINS = [
+    "nautobot_chatops",
+    "nautobot_chatops_arista_cloudvision",
+]
 
 # Plugins configuration settings. These settings are used by various plugins that the user may have installed.
 # Each key in the dictionary is the name of an installed plugin and its value is a dictionary of settings.
-# PLUGINS_CONFIG = {
-#     'my_plugin': {
-#         'foo': 'bar',
-#         'buzz': 'bazz'
-#     }
-# }
+PLUGINS_CONFIG = {
+    "nautobot_chatops": {
+        "enable_slack": os.environ.get("ENABLE_SLACK", False),
+        "slack_api_token": os.environ.get("SLACK_API_TOKEN"),
+        "slack_signing_secret": os.environ.get("SLACK_SIGNING_SECRET"),
+        "slack_slash_command_prefix": os.environ.get("SLACK_SLASH_COMMAND_PREFIX", "/"),
+        "enable_webex": os.environ.get("ENABLE_WEBEX", False),
+        "webex_token": os.environ.get("WEBEX_TOKEN"),
+        "webex_signing_secret": os.environ.get("WEBEX_SIGNING_SECRET"),
+        "enable_mattermost": os.environ.get("ENABLE_MATTERMOST", False),
+        "mattermost_api_token": os.environ.get("MATTERMOST_API_TOKEN"),
+        "mattermost_url": os.environ.get("MATTERMOST_URL"),
+        "enable_ms_teams": os.environ.get("ENABLE_MS_TEAMS", False),
+        "microsoft_app_id": os.environ.get("MICROSOFT_APP_ID"),
+        "microsoft_app_password": os.environ.get("MICROSOFT_APP_PASSWORD"),
+    },
+    "nautobot_chatops_arista_cloudvision": {
+        "cvaas_token": os.environ.get("CVAAS_TOKEN"),
+        "cvp_username": os.environ.get("CVP_USERNAME"),
+        "cvp_password": os.environ.get("CVP_PASSWORD"),
+        "cvp_host": os.environ.get("CVP_HOST"),
+        "cvp_insecure": os.environ.get("CVP_INSECURE"),
+        "on_prem": os.environ.get("ON_PREM", False),
+    },
+}
 
 # When determining the primary IP address for a device, IPv6 is preferred over IPv4 by default. Set this to True to
 # prefer IPv4 instead.
