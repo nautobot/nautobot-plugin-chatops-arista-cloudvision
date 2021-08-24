@@ -46,8 +46,7 @@ namespace.configure(
             "compose_files": [
                 "docker-compose.requirements.yml",
                 "docker-compose.base.yml",
-                "docker-compose.dev.yml",
-                "docker-compose.docs.yml",
+                "docker-compose.dev.yml"
             ],
         }
     }
