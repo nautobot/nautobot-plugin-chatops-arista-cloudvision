@@ -24,16 +24,16 @@ You must first update the Nautobot configuration file with a new entry in the `P
 PLUGINS_CONFIG = {
     'nautobot_chatops': {
         'enable_slack': True,
-        'slack_api_token': os.getenv("SLACK_API_TOKEN"),
-        'slack_signing_secret': os.getenv("SLACK_SIGNING_SECRET")
+        'slack_api_token': os.environ.get("SLACK_API_TOKEN"),
+        'slack_signing_secret': os.environ.get("SLACK_SIGNING_SECRET")
     },
     'nautobot_chatops_arista_cloudvision' : {
-        'cvaas_token': os.getenv("CVAAS_TOKEN"),
-        'cvp_username': os.getenv("CVP_USERNAME"),
-        'cvp_password': os.getenv("CVP_PASSWORD"),
-        'cvp_host': os.getenv("CVP_HOST"),
-        'cvp_insecure': os.getenv("CVP_INSECURE"),
-        'on_prem': os.getenv("ON_PREM")
+        'cvaas_token': os.environ.get("CVAAS_TOKEN"),
+        'cvp_username': os.environ.get("CVP_USERNAME"),
+        'cvp_password': os.environ.get("CVP_PASSWORD"),
+        'cvp_host': os.environ.get("CVP_HOST"),
+        'cvp_insecure': os.environ.get("CVP_INSECURE"),
+        'on_prem': os.environ.get("ON_PREM")
     }
 }
 ```

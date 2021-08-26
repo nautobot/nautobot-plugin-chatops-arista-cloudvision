@@ -36,17 +36,19 @@ from .utils import (
 
 logger = logging.getLogger("rq.worker")
 dir_path = os.path.dirname(os.path.realpath(__file__))
+CLOUDVISION_LOGO_PATH = "nautobot_cloudvision/cloudvision.png"
+CLOUDVISION_LOGO_ALT = "CloudVision Logo"
 PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_chatops_arista_cloudvision"]
 
 
 def cloudvision_logo(dispatcher):
     """Construct an image_element containing the locally hosted CVP logo."""
-    return dispatcher.image_element("cloudvision_chatbot/CloudvisionLogoSquare.png", alt_text="Cloudvision")
+    return dispatcher.image_element(dispatcher.static_url(CLOUDVISION_LOGO_PATH), alt_text=CLOUDVISION_LOGO_ALT)
 
 
 def check_credentials(dispatcher):
     """Check whether to use on prem or cloud instance of Cloudvision."""
-    if PLUGIN_SETTINGS.get("on_prem").lower() == "true":
+    if PLUGIN_SETTINGS.get("on_prem", "False").lower() == "true":
         if (
             not PLUGIN_SETTINGS.get("cvp_username")
             and not PLUGIN_SETTINGS.get("cvp_password")
@@ -99,6 +101,7 @@ def get_devices_in_container(dispatcher, container_name=None):
                 "get-devices-in-container",
                 [("Container Name", container_name)],
                 "information",
+                cloudvision_logo(dispatcher),
             )
         )
         header = ["Device", "In Container"]
@@ -130,7 +133,13 @@ def get_configlet(dispatcher, configlet_name=None):
 
     config = get_configlet_config(configlet_name)
     dispatcher.send_blocks(
-        dispatcher.command_response_header("cloudvision", "get-configlet", [("Configlet Name", configlet_name)])
+        dispatcher.command_response_header(
+            "cloudvision",
+            "get-configlet",
+            [("Configlet Name", configlet_name)],
+            "information",
+            cloudvision_logo(dispatcher),
+        )
     )
 
     dispatcher.send_snippet(f"{config}")
@@ -161,7 +170,13 @@ def get_device_configuration(dispatcher, device_name=None):
 
     running_config = get_device_running_configuration(device_mac_address)
     dispatcher.send_blocks(
-        dispatcher.command_response_header("cloudvision", "get-device-configuration", [("Device Name", device_name)])
+        dispatcher.command_response_header(
+            "cloudvision",
+            "get-device-configuration",
+            [("Device Name", device_name)],
+            "information",
+            cloudvision_logo(dispatcher),
+        )
     )
 
     dispatcher.send_snippet(running_config)
@@ -200,7 +215,11 @@ def get_task_logs(dispatcher, task_id=None):
 
     log_list = get_cloudvision_task_logs(single_task_cc_id, single_task_stage_id)
 
-    dispatcher.send_blocks(dispatcher.command_response_header("cloudvision", "get-task-logs", [("Task ID", task_id)]))
+    dispatcher.send_blocks(
+        dispatcher.command_response_header(
+            "cloudvision", "get-task-logs", [("Task ID", task_id)], "information", cloudvision_logo(dispatcher)
+        )
+    )
 
     dispatcher.send_snippet("\n".join(log for log in log_list))
     return CommandStatusChoices.STATUS_SUCCEEDED
@@ -261,6 +280,7 @@ def get_applied_configlets(dispatcher, filter_type=None, filter_value=None):
             "get-applied-configlets",
             [("Filter type", filter_type), ("Filter value", filter_value)],
             "information",
+            cloudvision_logo(dispatcher),
         )
     )
 
@@ -296,7 +316,11 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
 
         dispatcher.send_blocks(
             dispatcher.command_response_header(
-                "cloudvision", "get-active-events", [("Filter type", filter_type)], "information"
+                "cloudvision",
+                "get-active-events",
+                [("Filter type", filter_type)],
+                "information",
+                cloudvision_logo(dispatcher),
             )
         )
 
@@ -398,6 +422,7 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
                 ("End time", end_time),
             ],
             "information",
+            cloudvision_logo(dispatcher),
         )
     )
 
@@ -429,10 +454,7 @@ def get_tags(dispatcher, device_name=None):
 
     dispatcher.send_blocks(
         dispatcher.command_response_header(
-            "cloudvision",
-            "get-tags",
-            [("Device Name", device_name)],
-            "information",
+            "cloudvision", "get-tags", [("Device Name", device_name)], "information", cloudvision_logo(dispatcher)
         )
     )
 
@@ -468,7 +490,11 @@ def get_device_cve(dispatcher, device_name=None):
 
         dispatcher.send_blocks(
             dispatcher.command_response_header(
-                "cloudvision", "get-device-cve", [("Device Name", device_name)], "information"
+                "cloudvision",
+                "get-device-cve",
+                [("Device Name", device_name)],
+                "information",
+                cloudvision_logo(dispatcher),
             )
         )
 
@@ -494,7 +520,7 @@ def get_device_cve(dispatcher, device_name=None):
 
     dispatcher.send_blocks(
         dispatcher.command_response_header(
-            "cloudvision", "get-device-cve", [("Device Name", device_name)], "information"
+            "cloudvision", "get-device-cve", [("Device Name", device_name)], "information", cloudvision_logo(dispatcher)
         )
     )
 
