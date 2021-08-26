@@ -523,8 +523,8 @@ def get_token_crt():
             f"https://{CVP_HOST}/cvpservice/login/authenticate.do", auth=(CVP_USERNAME, CVP_PASSWORD)
         )
 
-    with open("token.txt", "w") as tokenfile:
+    with open("token.txt", "w") as tokenfile:  # pylint: disable=unspecified-encoding
         tokenfile.write(request.json()["sessionId"])
 
-    with open("cvp.crt", "w") as cert_file:
+    with open("cvp.crt", "w") as cert_file:  # pylint: disable=unspecified-encoding
         cert_file.write(ssl.get_server_certificate((CVP_HOST, 8443)))

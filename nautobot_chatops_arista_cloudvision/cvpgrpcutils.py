@@ -59,7 +59,7 @@ def get_device_tags(device_id: str, settings):
         ]
     )
     responses = tag_stub.GetAll(req)
-    tags = list()
+    tags = []
     for resp in responses:
         dev_tag = {
             "label": resp.value.key.label.value,
