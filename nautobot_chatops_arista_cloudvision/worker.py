@@ -48,7 +48,11 @@ def cloudvision_logo(dispatcher):
 
 def check_credentials(dispatcher):
     """Check whether to use on prem or cloud instance of Cloudvision."""
-    if PLUGIN_SETTINGS.get("on_prem", "False").lower() == "true":
+    on_prem = PLUGIN_SETTINGS.get("on_prem")
+    if on_prem is None:
+        on_prem = "false"
+
+    if str(on_prem).upper() == "true":
         if (
             not PLUGIN_SETTINGS.get("cvp_username")
             and not PLUGIN_SETTINGS.get("cvp_password")
@@ -362,7 +366,7 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
     if not end_time:
         dispatcher.prompt_for_text(
             f"cloudvision get-active-events {filter_type} {filter_value} {start_time}",
-            "Enter start time in ISO format or enter a relative time using 'h' for hours, 'd' for days, and 'w' for weeks. Ex: '-2d'. You may also type 'now' to use the current time.",
+            "Enter end time in ISO format or enter a relative time using 'h' for hours, 'd' for days, and 'w' for weeks. Ex: '-2d'. You may also type 'now' to use the current time.",
             "End Time",
         )
         return False
@@ -377,6 +381,17 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
             start_time = datetime.now() - timedelta(weeks=int(time_diff))
         elif start_time[-1] == "m":
             start_time = datetime.now() - timedelta(minutes=int(time_diff))
+
+    if end_time.startswith("-"):
+        time_diff = end_time[1:-1]
+        if end_time[-1] == "h":
+            end_time = datetime.now() - timedelta(hours=int(time_diff))
+        elif end_time[-1] == "d":
+            end_time = datetime.now() - timedelta(days=int(time_diff))
+        elif end_time[-1] == "w":
+            end_time = datetime.now() - timedelta(weeks=int(time_diff))
+        elif end_time[-1] == "m":
+            end_time = datetime.now() - timedelta(minutes=int(time_diff))
 
     if end_time.lower() == "now":
         end_time = str(datetime.now())
@@ -394,7 +409,7 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
             filter_type=filter_type, filter_value=filter_value, start_time=start_time, end_time=end_time
         )
         dispatcher.send_markdown(
-            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with for device {filter_value}.",
+            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events for device {filter_value}.",
             ephemeral=True,
         )
     elif filter_type == "type":
@@ -402,11 +417,9 @@ def get_active_events(dispatcher, filter_type=None, filter_value=None, start_tim
             filter_type=filter_type, filter_value=filter_value, start_time=start_time, end_time=end_time
         )
         dispatcher.send_markdown(
-            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events with for event type {filter_value}.",
+            f"Stand by {dispatcher.user_mention()}, I'm getting the desired events for event type {filter_value}.",
             ephemeral=True,
         )
-
-    dispatcher.send_markdown(f"Stand by {dispatcher.user_mention()}, I'm getting those events.", ephemeral=True)
 
     header = ["Title", "Severity", "Description", "Device"]
     rows = [(event["title"], event["severity"], event["description"], event["deviceId"]) for event in active_events]

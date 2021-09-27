@@ -14,7 +14,7 @@ directory = os.path.dirname(fullpath)
 PLUGIN_SETTINGS = settings.PLUGINS_CONFIG["nautobot_chatops_arista_cloudvision"]
 
 CVAAS_TOKEN = PLUGIN_SETTINGS.get("cvaas_token")
-CVAAS_ADDR = "apiserver.arista.io:443"
+CVAAS_ADDR = PLUGIN_SETTINGS.get("cvaas_url", "www.arista.io:443")
 
 CVP_USERNAME = PLUGIN_SETTINGS.get("cvp_username")
 CVP_PASSWORD = PLUGIN_SETTINGS.get("cvp_password")
@@ -24,15 +24,6 @@ ON_PREM = PLUGIN_SETTINGS.get("on_prem")
 CVP_TOKEN = PLUGIN_SETTINGS.get("cvp_token")
 CVP_TOKEN_PATH = "token.txt"  # nosec
 CRT_FILE_PATH = "cvp.crt"
-
-
-CVP_LOGO_PATH = "cloudvision/CloudvisionLogoSquare.png"
-CVP_LOGO_ALT = "Cloudvision Logo"
-
-
-def cloudvision_logo(dispatcher):
-    """Construct an image_element containing the locally hosted CVP logo."""
-    return dispatcher.image_element(dispatcher.static_url(CVP_LOGO_PATH), alt_text=CVP_LOGO_ALT)
 
 
 def prompt_for_events_filter(action_id, help_text, dispatcher):
@@ -60,12 +51,20 @@ def prompt_for_image_bundle_name_or_all(action_id, help_text, dispatcher):
 
 def connect_cvp():
     """Connect to an instance of Cloudvision."""
-    if ON_PREM.lower() == "true":
+    on_prem = PLUGIN_SETTINGS.get("on_prem")
+    if on_prem is None:
+        on_prem = "false"
+
+    cvaas_url = PLUGIN_SETTINGS.get("cvaas_url")
+    if cvaas_url is None:
+        cvaas_url = "www.arista.io"
+
+    if str(on_prem).lower() == "true":
         clnt = CvpClient()
         clnt.connect([CVP_HOST], CVP_USERNAME, CVP_PASSWORD)
     else:
         clnt = CvpClient()
-        clnt.connect(["www.arista.io"], username="", password="", is_cvaas=True, api_token=CVAAS_TOKEN)  # nosec
+        clnt.connect([cvaas_url], username="", password="", is_cvaas=True, api_token=CVAAS_TOKEN)  # nosec
     return clnt
 
 
@@ -243,7 +242,10 @@ def get_active_events_data(apiserverAddr=None, token=None, certs=None, key=None,
                         events.append(single_event)
         return events
 
-    apiserverAddr = CVAAS_ADDR
+    if CVAAS_ADDR is None:
+        apiserverAddr = "apiserver.arista.io"
+    else:
+        apiserverAddr = f"apiserver.{CVAAS_ADDR[4:]}"
     token = CVAAS_TOKEN
 
     pathElts = [
@@ -312,7 +314,11 @@ def get_active_events_data_filter(
 
         return events
 
-    apiserverAddr = CVAAS_ADDR
+    if CVAAS_ADDR is None:
+        apiserverAddr = "apiserver.arista.io"
+    else:
+        apiserverAddr = f"apiserver.{CVAAS_ADDR[4:]}"
+
     token = CVAAS_TOKEN
 
     start = Timestamp()
@@ -374,7 +380,10 @@ def get_active_severity_types(apiserverAddr=None, token=None, certs=None, key=No
                         event_types.append(info)
         return event_types
 
-    apiserverAddr = CVAAS_ADDR
+    if CVAAS_ADDR is None:
+        apiserverAddr = "apiserver.arista.io"
+    else:
+        apiserverAddr = f"apiserver.{CVAAS_ADDR[4:]}"
     token = CVAAS_TOKEN
 
     pathElts = [
@@ -417,7 +426,10 @@ def get_device_bugs_data(device_id, apiserverAddr=None, token=None, certs=None, 
                         return notif["updates"].get(device_id)
         return bugs
 
-    apiserverAddr = CVAAS_ADDR
+    if CVAAS_ADDR is None:
+        apiserverAddr = "apiserver.arista.io"
+    else:
+        apiserverAddr = f"apiserver.{CVAAS_ADDR[4:]}"
     token = CVAAS_TOKEN
 
     pathElts = ["tags", "BugAlerts", "devices"]
@@ -454,7 +466,10 @@ def get_bug_info(bug_id, apiserverAddr=None, token=None):
                     bug_info["versions_fixed"] = notif["updates"]["versionFixed"]
         return bug_info
 
-    apiserverAddr = CVAAS_ADDR
+    if CVAAS_ADDR is None:
+        apiserverAddr = "apiserver.arista.io"
+    else:
+        apiserverAddr = f"apiserver.{CVAAS_ADDR[4:]}"
     token = CVAAS_TOKEN
 
     pathElts = [
@@ -490,7 +505,10 @@ def get_bug_device_report(apiserverAddr=None, token=None):
                     bug_count = notif["updates"]
         return bug_count
 
-    apiserverAddr = CVAAS_ADDR
+    if CVAAS_ADDR is None:
+        apiserverAddr = "apiserver.arista.io"
+    else:
+        apiserverAddr = f"apiserver.{CVAAS_ADDR[4:]}"
     token = CVAAS_TOKEN
 
     pathElts = ["BugAlerts", "DevicesBugsCount"]
@@ -505,7 +523,11 @@ def get_bug_device_report(apiserverAddr=None, token=None):
 
 def check_on_prem():
     """Checks environment variable 'on_prem'."""
-    if ON_PREM.lower() == "false":
+    on_prem = PLUGIN_SETTINGS.get("on_prem")
+    if on_prem is None:
+        on_prem = "false"
+
+    if on_prem.lower() == "false":
         return False
     return True
 

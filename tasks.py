@@ -40,7 +40,7 @@ namespace.configure(
         "nautobot_chatops_arista_cloudvision": {
             "nautobot_ver": "1.0.1",
             "project_name": "nautobot_chatops_arista_cloudvision",
-            "python_ver": "3.6",
+            "python_ver": "3.8",
             "local": False,
             "compose_dir": os.path.join(os.path.dirname(__file__), "development"),
             "compose_files": ["docker-compose.requirements.yml", "docker-compose.base.yml", "docker-compose.dev.yml"],
