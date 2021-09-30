@@ -5,6 +5,7 @@ import requests
 import grpc
 import arista.tag.v1 as tag
 from google.protobuf import wrappers_pb2 as wrappers
+from .utils import CVAAS_ADDR
 
 
 def connect_cv(settings):
@@ -32,7 +33,10 @@ def connect_cv(settings):
         call_creds = grpc.access_token_call_credentials(response.json()["sessionId"])
     # Set up credentials for CVaaS using supplied token.
     else:
-        cvp_url = "www.arista.io:443"
+        if CVAAS_ADDR is None:
+            cvp_url = "www.arista.io:443"
+        else:
+            cvp_url = CVAAS_ADDR
         call_creds = grpc.access_token_call_credentials(settings.get("cvaas_token"))
         channel_creds = grpc.ssl_channel_credentials()
     conn_creds = grpc.composite_channel_credentials(channel_creds, call_creds)
