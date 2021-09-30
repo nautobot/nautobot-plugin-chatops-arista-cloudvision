@@ -43,7 +43,7 @@ After that, you must update environment variables depending on if you are using 
 For CVAAS the following environment variables must be set.
 
 - `CVAAS_TOKEN`: Token generated from CVAAS service account. Documentation for that process can be found [here](https://www.arista.com/assets/data/pdf/qsg/qsg-books/QS_CloudVision_as_a_Service.pdf) in section 1.7
-- `CVAAS_URL`: This is the url of your CloudVision-as-a-Service. When setting this make sure to include `www`. When not set, this defaults to `www.rista.io`
+- `CVAAS_URL`: This is the url of your CloudVision-as-a-Service. When setting this make sure to include `www`. When not set, this defaults to `www.arista.io`
 
 For on premise instance of CloudVision, these environment variables must be set.
 
