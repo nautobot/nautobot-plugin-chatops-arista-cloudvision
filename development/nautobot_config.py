@@ -268,11 +268,12 @@ PLUGINS_CONFIG = {
     },
     "nautobot_chatops_arista_cloudvision": {
         "cvaas_token": os.environ.get("CVAAS_TOKEN"),
+        "cvaas_url": os.environ.get("CVAAS_URL"),
         "cvp_username": os.environ.get("CVP_USERNAME"),
         "cvp_password": os.environ.get("CVP_PASSWORD"),
         "cvp_host": os.environ.get("CVP_HOST"),
         "cvp_insecure": os.environ.get("CVP_INSECURE"),
-        "on_prem": os.environ.get("ON_PREM", False),
+        "on_prem": os.environ.get("ON_PREM"),
     },
 }
 
