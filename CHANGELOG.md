@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.2.0 - 2021-08-31
+
+### Changed
+
+- #25 Update environment to newer standards
+- #20 Dependency Updates
+
+### Removed
+
+- #25 Dropped support for Nautobot <1.2.0
+
 ## v1.0.2 - 2021-09-30
 
 ### Added

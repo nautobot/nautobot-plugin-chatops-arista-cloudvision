@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nautobot-chatops-arista-cloudvision"
-version = "1.0.2"
+version = "1.2.0"
 description = "Nautobot Chatops Arista Cloudvision Integration"
 authors = ["Network to Code, LLC <info@networktocode.com>"]
 license = "Apache-2.0"
@@ -22,10 +22,10 @@ packages = [
 [tool.poetry.dependencies]
 # Used for local development
 nautobot = { version = "*", optional = true }
-python = "^3.6"
-protobuf = "3.17.2"
+python = "^3.7"
+protobuf = "^3.17"
 cvprac = "^1.0.6"
-cloudvision = "1.1.0"
+cloudvision = "^1.1"
 nautobot-chatops = "^1.5.0"
 certifi = "^2021.5.30"
 
@@ -38,7 +38,8 @@ flake8 = "*"
 invoke = "*"
 mkdocs = "*"
 pydocstyle = "*"
-pylint = "*"
+# Pinning pylint to match nautobot core.
+pylint = {version = "~2.14.5", python = "^3.7.2"}
 pylint-django = "*"
 yamllint = "*"
 
@@ -71,6 +72,7 @@ exclude = '''
 [tool.pylint.master]
 # Include the pylint_django plugin to avoid spurious warnings about Django patterns
 load-plugins="pylint_django"
+ignore=[".venv"]
 
 [tool.pylint.basic]
 # No docstrings required for private methods (Pylint default), or for test_ functions, or for inner Meta classes.
@@ -81,7 +83,7 @@ no-docstring-rgx="^(_|test_|Meta$)"
 # Pylint and Black disagree about how to format multi-line arrays; Black wins.
 disable = """,
     line-too-long,
-    bad-continuation,
+    too-few-public-methods,
     """
 
 [tool.pylint.miscellaneous]
