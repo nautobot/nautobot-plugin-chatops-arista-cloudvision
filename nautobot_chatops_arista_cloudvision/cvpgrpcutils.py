@@ -45,7 +45,7 @@ def connect_cv(settings):
 
 def disconnect_cv():
     """Close the shared gRPC channel."""
-    global _channel  # pylint: disable=C0103,W0601
+    global _channel  # pylint: disable=global-variable-not-assigned,invalid-name
     _channel.close()
 
 
@@ -57,7 +57,7 @@ def get_device_tags(device_id: str, settings):
         partial_eq_filter=[
             tag.models.DeviceTagAssignmentConfig(
                 key=tag.models.DeviceTagAssignmentKey(
-                    device_id=wrappers.StringValue(value=device_id),
+                    device_id=wrappers.StringValue(value=device_id),  # pylint: disable=no-member
                 )
             )
         ]

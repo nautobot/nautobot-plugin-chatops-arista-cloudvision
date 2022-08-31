@@ -3,7 +3,7 @@ import os
 import ssl
 from datetime import datetime
 import requests
-from google.protobuf.timestamp_pb2 import Timestamp
+from google.protobuf.timestamp_pb2 import Timestamp  # pylint: disable=no-name-in-module
 from cloudvision.Connector.grpc_client import GRPCClient, create_query
 from cvprac.cvp_client import CvpClient
 from django.conf import settings
