@@ -23,7 +23,7 @@ packages = [
 # Used for local development
 nautobot = { version = "*", optional = true }
 python = "^3.7"
-protobuf = "3.17.2"
+protobuf = "^3.17"
 cvprac = "^1.0.6"
 cloudvision = "^1.1"
 nautobot-chatops = "^1.5.0"
