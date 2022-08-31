@@ -1,8 +1,14 @@
 """Plugin declaration for nautobot_chatops_arista_cloudvision."""
-
-__version__ = "1.0.2"
+# Metadata is inherited from Nautobot. If not including Nautobot in the environment, this should be added
+try:
+    from importlib import metadata
+except ImportError:
+    # Python version < 3.8
+    import importlib_metadata as metadata
 
 from nautobot.extras.plugins import PluginConfig
+
+__version__ = metadata.version(__name__)
 
 
 class NautobotChatopsExtensionAristaConfig(PluginConfig):
@@ -15,7 +21,7 @@ class NautobotChatopsExtensionAristaConfig(PluginConfig):
     description = "Nautobot Chatops Arista Cloudvision Integration."
     base_url = "nautobot_chatops_arista_cloudvision"
     required_settings = []
-    min_version = "1.0.0"
+    min_version = "1.2.0"
     max_version = "1.9999"
     default_settings = {}
     caching_config = {}
