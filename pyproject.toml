@@ -27,7 +27,7 @@ protobuf = "^3.17"
 cvprac = "^1.0.6"
 cloudvision = "^1.1"
 nautobot-chatops = "^1.5.0"
-certifi = "^2021.5.30"
+certifi = ">=2021.5.30,<2023.0.0"
 
 [tool.poetry.dev-dependencies]
 bandit = "*"
