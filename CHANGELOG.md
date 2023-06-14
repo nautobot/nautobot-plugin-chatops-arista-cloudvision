@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.3.0 - 2023-06-14
+
+### Changed
+
+- Dropping support for python 3.7
+- Update dependencies to close vulnerabilty
+
 ## v1.2.0 - 2021-08-31
 
 ### Changed
