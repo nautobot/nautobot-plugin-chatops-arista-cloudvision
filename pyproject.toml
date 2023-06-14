@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nautobot-chatops-arista-cloudvision"
-version = "1.2.0"
+version = "1.3.0"
 description = "Nautobot Chatops Arista Cloudvision Integration"
 authors = ["Network to Code, LLC <info@networktocode.com>"]
 license = "Apache-2.0"
@@ -21,13 +21,12 @@ packages = [
 
 [tool.poetry.dependencies]
 # Used for local development
-nautobot = { version = "*", optional = true }
-python = "^3.7"
+nautobot = "^1.5.9"
+python = "^3.8"
 protobuf = "^3.17"
 cvprac = "^1.0.6"
 cloudvision = "^1.1"
 nautobot-chatops = "^1.5.0"
-certifi = "^2021.5.30"
 
 [tool.poetry.dev-dependencies]
 bandit = "*"

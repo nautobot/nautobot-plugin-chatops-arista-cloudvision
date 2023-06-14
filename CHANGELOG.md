@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.3.0 - 2023-06-14
+
+### Changed
+
+- Dropping support for Python 3.7
+- Dropping <1.5.9 support of Nautobot
+- Update dependencies to close vulnerabilty
+
 ## v1.2.0 - 2021-08-31
 
 ### Changed

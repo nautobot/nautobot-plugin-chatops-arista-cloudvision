@@ -98,7 +98,6 @@ def get_devices_in_container(dispatcher, container_name=None):
     devices = get_cloudvision_container_devices(container_name)
 
     if devices:
-
         dispatcher.send_blocks(
             dispatcher.command_response_header(
                 "cloudvision",

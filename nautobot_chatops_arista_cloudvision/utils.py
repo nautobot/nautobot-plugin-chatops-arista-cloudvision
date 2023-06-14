@@ -542,7 +542,7 @@ def get_token_crt():
         )
     else:
         request = requests.post(
-            f"https://{CVP_HOST}/cvpservice/login/authenticate.do", auth=(CVP_USERNAME, CVP_PASSWORD)
+            f"https://{CVP_HOST}/cvpservice/login/authenticate.do", auth=(CVP_USERNAME, CVP_PASSWORD)  # nosec
         )
 
     with open("token.txt", "w") as tokenfile:  # pylint: disable=unspecified-encoding

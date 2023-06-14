@@ -29,7 +29,9 @@ def connect_cv(settings):
         # Otherwise, the server is expected to have a valid certificate signed by a well-known CA.
         else:
             channel_creds = grpc.ssl_channel_credentials()
-            response = requests.post(f"https://{cvp_host}/cvpservice/login/authenticate.do", auth=(username, password))
+            response = requests.post(
+                f"https://{cvp_host}/cvpservice/login/authenticate.do", auth=(username, password)
+            )  # nosec
         call_creds = grpc.access_token_call_credentials(response.json()["sessionId"])
     # Set up credentials for CVaaS using supplied token.
     else:
