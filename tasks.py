@@ -38,7 +38,7 @@ namespace = Collection("nautobot_chatops_arista_cloudvision")
 namespace.configure(
     {
         "nautobot_chatops_arista_cloudvision": {
-            "nautobot_ver": "1.2.0",
+            "nautobot_ver": "1.5.9",
             "project_name": "nautobot_chatops_arista_cloudvision",
             "python_ver": "3.8",
             "local": False,

@@ -4,7 +4,8 @@
 
 ### Changed
 
-- Dropping support for python 3.7
+- Dropping support for Python 3.7
+- Dropping <1.5.9 support of Nautobot
 - Update dependencies to close vulnerabilty
 
 ## v1.2.0 - 2021-08-31

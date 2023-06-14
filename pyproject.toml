@@ -21,7 +21,7 @@ packages = [
 
 [tool.poetry.dependencies]
 # Used for local development
-nautobot = { version = "*", optional = true }
+nautobot = "^1.5.9"
 python = "^3.8"
 protobuf = "^3.17"
 cvprac = "^1.0.6"
