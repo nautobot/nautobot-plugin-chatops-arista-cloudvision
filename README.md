@@ -1,5 +1,7 @@
 # Arista CloudVision ChatOps
 
+# The code in this repository has been migrated to the [Nautobot ChatOps Repository](https://github.com/nautobot/nautobot-plugin-chatops) as an integration - read more about it in the [ChatOps Docs](https://docs.nautobot.com/projects/chatops/en/latest/admin/install/)! As of July 2023 this repository has been **FROZEN** - all development / issues / discussions for this integration are in the [Nautobot ChatOps Repository](https://github.com/nautobot/nautobot-plugin-chatops) going forward.
+
 Using the [Nautobot ChatOps](https://github.com/nautobot/nautobot-plugin-chatops/) base framework, this app adds the ability to gather tag data, device configuration, devices in a specific container, task logs, configlets, device's common vulnerabilities and exposures, and device events from Arista's CloudVision using Slack, Webex Team, MS Teams, and Mattermost.
 
 ## Screenshots
